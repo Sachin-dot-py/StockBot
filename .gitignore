@@ -1,0 +1,5 @@
+*.pyc
+credentials.py
+stockbot.log
+stocks.db
+.DS_Store
