@@ -34,6 +34,7 @@ def respond():
 
 @app.route('/check_predictions',methods=['POST'])
 def getPredictions():
+    """ Recieves predictions and checks if stocks in the watchlist are included in it """
     request_data = request.get_json(force=True)
     df = pd.read_json(request_data).drop('index',axis=1)
     stocks = []
@@ -49,6 +50,7 @@ def getPredictions():
     return 'ok'
 
 def setWebhook():
+    """ Sets telegram webhook """
     s = bot.setWebhook('{URL}{HOOK}'.format(URL=url, HOOK=token))
     if s:
         logging.info("Webhook succesfully set up!")

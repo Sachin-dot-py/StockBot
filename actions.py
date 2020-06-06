@@ -8,6 +8,7 @@ import logging
 bot = telegram.Bot(token=token)
 
 def checkStock(stock_id):
+    """ Checks price of stock from Yahoo! Finance """
     stock = si.get_quote_table(stock_id, dict_result = True)
     quote_price = round(stock['Quote Price'],2)
     close_price = stock['Previous Close']
@@ -17,9 +18,11 @@ def checkStock(stock_id):
     return (quote_price,percentage,volume,day_range)
 
 def CheckStockCall(stock_id,stock_data):
+    """ Worker process spawned by checkStocksThreaded() """
     stock_data[stock_id] = checkStock(stock_id)
 
 def checkStocksThreaded(stock_ids):
+    """ Multithreaded checking stock price """
     manager = multiprocessing.Manager()
     stock_data = manager.dict()
     workers = []
@@ -32,6 +35,7 @@ def checkStocksThreaded(stock_ids):
     return stock_data
 
 def QuarterlyCheck():
+    """ 15 minute check during trading hours to make sure stock price has not hit target """
     stocklist = stockDB.stockList()
     stock_ids = [stock_id for stock_id,_ in stocklist]
     stock_data = checkStocksThreaded(stock_ids)
@@ -60,9 +64,11 @@ def QuarterlyCheck():
     logging.info("Performed quarterly stock price check")
 
 def sendMessage(message,chat_id='1207015683'): # 1207015683, 855910557
+    """ Send message via telegram to user """
     bot.sendMessage(chat_id=chat_id,text=message)
 
 def newMessage(message):
+    """ Parse a new message received from Telegram """
     logging.info(f"Got new message {message}")
     if message[0] == '/':
         command = message.split()[0].strip('/')
