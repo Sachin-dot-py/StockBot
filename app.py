@@ -1,5 +1,5 @@
 from actions import *
-from credentials import token,url
+from credentials import token,url,logfile
 import telegram
 import logging
 import sys
@@ -14,7 +14,7 @@ def handle_unhandled_exception(exc_type, exc_value, exc_traceback):
         return
     logging.critical("", exc_info=(exc_type, exc_value, exc_traceback))
 
-logging.basicConfig(filename='stockbot.log', format='%(asctime)s ~ %(levelname)s : %(message)s', datefmt='%d-%m-%Y %H:%M:%S',level=logging.INFO)
+logging.basicConfig(filename=logfile, format='%(asctime)s ~ %(levelname)s : %(message)s', datefmt='%d-%m-%Y %H:%M:%S',level=logging.INFO)
 sys.excepthook = handle_unhandled_exception
 bot = telegram.Bot(token=token)
 app = Flask(__name__)

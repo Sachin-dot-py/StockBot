@@ -8,6 +8,7 @@
 - Create a credentials.py file in the below format:
 ```python3
 url = 'SITE_URL'
+logfile = 'LOG_FILE_NAME'
 token = 'TELEGRAM_TOKEN'
 ```
 - Type ```flask run``` and to start the app
