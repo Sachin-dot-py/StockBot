@@ -14,9 +14,9 @@ class StockDB():
         self.conn.execute("""INSERT INTO stocklist (stock_id, stock_trigger, trigger_type) values (?,?,?) """, (stock_id,stock_trigger,trigger_type))
         self.conn.commit()
 
-    def removeStock(self, stock_id : str):
+    def removeStock(self, stock_id : str, trigger_type : str):
         """ Removes a stock from the database."""
-        self.conn.execute("""DELETE FROM stocklist WHERE stock_id=?""",(stock_id,))
+        self.conn.execute("""DELETE FROM stocklist WHERE stock_id=? AND trigger_type=?""",(stock_id,trigger_type))
         self.conn.commit()
 
     def changeStock(self, stock_id : str, new_trigger : int, trigger_type : str):

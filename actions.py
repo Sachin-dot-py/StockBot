@@ -89,14 +89,14 @@ def newMessage(message):
                 line = f"Stock ID : {items[1]}\nStock Price : ${stock_info[0]}\nIncrease/Decrease % : {'' if stock_info[1] < 0 else '+'}{stock_info[1]}%\nVolume :  {stock_info[2]}\nDay's Range : {stock_info[3]}"
                 sendMessage(line)
             except:
-                stockDB.removeStock(items[1])
+                stockDB.removeStock(items[1],trigger_type)
                 sendMessage(f"Error: {items[1]} doesn't exist and therefore not added to watchlist. Check your spelling.")
     elif command == 'remove_stock':
         items = message.split()
-        if len(items) != 2:
-            sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/remove_stock AAPL")
+        if len(items) != 3:
+            sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/remove_stock AAPL BUY")
         else:
-            stockDB.removeStock(items[1])
+            stockDB.removeStock(items[1],items[2])
             sendMessage(f"{items[1]} stock succesfully removed from watchlist!")
     elif command == 'change_stock':
         items = message.split()
