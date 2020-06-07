@@ -4,7 +4,7 @@ import time
 class StockDB():
     """ All operations to do with adding, removing and getting stocks from the watchlist"""
     def __init__(self):
-        self.conn = sqlite3.connect("stocks.db") 
+        self.conn = sqlite3.connect("stocks.db", check_same_thread=False) 
         self.cur = self.conn.cursor()
         self.conn.execute("""CREATE TABLE IF NOT EXISTS stocklist (stock_id TEXT, stock_trigger REAL , trigger_type TEXT)""")
     
@@ -32,7 +32,7 @@ class StockDB():
 class MsgRecordDB():
     """ Managing records of previous alert sent by run_check """
     def __init__(self):
-        self.conn = sqlite3.connect("stocks.db") 
+        self.conn = sqlite3.connect("stocks.db", check_same_thread=False) 
         self.cur = self.conn.cursor()
         self.conn.execute("""CREATE TABLE IF NOT EXISTS lastmessages (stock_id TEXT, trigger_type TEXT, trigger_time TEXT)""")
 

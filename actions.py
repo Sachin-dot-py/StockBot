@@ -74,6 +74,7 @@ def newMessage(message):
         command = message.split()[0].strip('/')
     else:
         sendMessage(f"'{message}' is not a valid command.\nType /help for more info")
+        return
     if command == 'help':
         sendMessage("Welcome to the Stock bot!\n\nList of commands:\n1. /help - Show this message and exit.\n2. /add_stock - Add a stock to the watch list.\n3. /remove_stock - Remove a stock from the watch list.\n4. /list_stock - Lists all stock and trigger prices in the watchlist\n5. /report - Get a report of the prices of the stocks in your Watchlist\n6. /get_stock - Check the details of any stock\n7. /run_check - Checks if stocks have gone past trigger price")
     elif command == 'add_stock':
