@@ -1,5 +1,5 @@
 from stockdb import stockDB,msgrecordDB
-from credentials import token,url
+from credentials import token
 from yahoo_fin import stock_info as si
 import telegram
 import multiprocessing
@@ -37,10 +37,10 @@ def checkStocksThreaded(stock_ids):
 def QuarterlyCheck():
     """ 15 minute check during trading hours to make sure stock price has not hit target """
     stocklist = stockDB.stockList()
-    stock_ids = [stock_id for stock_id,_ in stocklist]
-    stock_data = checkStocksThreaded(stock_ids)
+    stock_ids = [stock_id for stock_id,_,_ in stocklist]
+    stock_datas = checkStocksThreaded(stock_ids)
     for stock_id,stock_trigger,trigger_type in stocklist:
-        stock_data = stock_data[stock_id]
+        stock_data = stock_datas[stock_id]
         quote_price,percentage,volume,day_range = stock_data
         last_time = msgrecordDB.getMsgRecord(stock_id,trigger_type)
         if last_time: date = last_time[2]
@@ -69,7 +69,6 @@ def sendMessage(message,chat_id='1207015683'): # 1207015683, 855910557
 
 def newMessage(message):
     """ Parse a new message received from Telegram """
-    logging.info(f"Got new message {message}")
     if message[0] == '/':
         command = message.split()[0].strip('/')
     else:

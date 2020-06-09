@@ -1,8 +1,10 @@
 from actions import *
-from credentials import token,url,logfile
+from credentials import token,logfile
 import telegram
 import logging
 import sys
+import os
+import subprocess
 import pandas as pd
 from flask import Flask, request
 
@@ -49,15 +51,22 @@ def getPredictions():
     logging.info('Predictions check ran succesfully!')
     return 'ok'
 
-def setWebhook():
+def setWebhook(url):
     """ Sets telegram webhook """
-    s = bot.setWebhook('{URL}{HOOK}'.format(URL=url, HOOK=token))
+    s = bot.setWebhook('{URL}/{HOOK}'.format(URL=url, HOOK=token))
     if s:
         logging.info("Webhook succesfully set up!")
     else:
         logging.error("Webhook setup failed.")
 
+def ngrok():
+    """ Starts ngrok and returns url """
+    os.system('ngrok http 5000 > /dev/null &')
+    url = "https://" + subprocess.check_output(r"""curl --silent --show-error http://127.0.0.1:4040/api/tunnels | sed -nE 's/.*public_url":"https:..([^"]*).*/\1/p'""", shell=True).decode('utf-8').strip('\n')
+    return url
+
 if __name__ == '__main__':
-    setWebhook()
+    url = ngrok()
+    setWebhook(url)
     logging.info("Web app starting")
     app.run(threaded=True)
