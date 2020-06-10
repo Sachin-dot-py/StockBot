@@ -67,6 +67,7 @@ def ngrok():
 
 if __name__ == '__main__':
     url = ngrok()
+    logging.info(f"Ngrok url obtained (url)")
     setWebhook(url)
     logging.info("Web app starting")
     app.run(threaded=True)
