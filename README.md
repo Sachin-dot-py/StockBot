@@ -12,8 +12,4 @@ logfile = 'LOG_FILE_NAME'
 token = 'TELEGRAM_TOKEN'
 ```
 - Type ```flask run``` and to start the app
-- Use serveo.net to expose your local ip to the internet
-```shell
-$ ssh -R sachin@serveo.net:22:localhost:22 serveo.net
-``` 
 - You're all set!
