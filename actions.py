@@ -1,8 +1,8 @@
 from stockdb import stockDB,msgrecordDB
 from credentials import token
 from yahoo_fin import stock_info as si
+from multiprocessing.pool import ThreadPool
 import telegram
-import multiprocessing
 import logging
 
 bot = telegram.Bot(token=token)
@@ -17,22 +17,11 @@ def checkStock(stock_id):
     volume = int(stock['Volume'])
     return (quote_price,percentage,volume,day_range)
 
-def CheckStockCall(stock_id,stock_data):
-    """ Worker process spawned by checkStocksThreaded() """
-    stock_data[stock_id] = checkStock(stock_id)
-
-def checkStocksThreaded(stock_ids):
-    """ Multithreaded checking stock price """
-    manager = multiprocessing.Manager()
-    stock_data = manager.dict()
-    workers = []
-    for stock_id in stock_ids:
-        p = multiprocessing.Process(target=CheckStockCall,args=(stock_id,stock_data))
-        workers.append(p)
-        p.start()
-    for worker in workers:
-        worker.join()
-    return stock_data
+def checkStocksThreaded(stock_ids : list) -> dict:
+    stock_ids = list(dict.fromkeys(stock_ids))
+    with ThreadPool(64) as pool:
+        results = pool.map(checkStock, stock_ids)
+    return dict(zip(stock_ids,results))
 
 def QuarterlyCheck():
     """ 15 minute check during trading hours to make sure stock price has not hit target """
