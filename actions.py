@@ -89,10 +89,10 @@ def newMessage(message):
             sendMessage(f"{items[1]} stock succesfully removed from watchlist!")
     elif command == 'change_stock':
         items = message.split()
-        if len(items) != 3:
-            sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/change_stock AAPL 200")
+        if len(items) != 4:
+            sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/change_stock AAPL 200 SELL")
         else:
-            stockDB.changeStock(items[1],items[2])
+            stockDB.changeStock(items[1],items[2],items[3])
             sendMessage(f"{items[1]} stock succesfully changed in watchlist!")
     elif command == 'list_stock':
         message = "Stock Watchlist:\n\nStock ID - Target Price - Buy/Sell"
