@@ -1,4 +1,4 @@
-from stockdb import stockDB,msgrecordDB
+from stockdb import stockDB,msgrecordDB,predictionrecordDB
 from credentials import token
 from loggingconfig import *
 from yahoo_fin import stock_info as si

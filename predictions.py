@@ -20,8 +20,11 @@ def predictionsCheck():
     for result in predictions.values:
         ticker = result[1]
         if ticker.upper() in stocks:
-            message = f"Prediction for {result[0]} ({result[1]}):\nFirm: {result[2]}\nRatings Change: {result[3]}\nPrice Target: {result[4]}"
-            sendMessage(message)
+            prev_alert = predictionrecordDB.getPredictionRecord(*result)
+            if not prev_alert:
+                message = f"Prediction for {result[0]} ({result[1]}):\nFirm: {result[2]}\nRatings Change: {result[3]}\nPrice Target: {result[4]}"
+                sendMessage(message)
+                predictionrecordDB.addPredictionRecord(*result)
     logging.info("Predictions check ran succesfully")
 
 if __name__ == "__main__":
