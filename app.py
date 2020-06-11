@@ -63,11 +63,14 @@ def ngrok():
     """ Starts ngrok and returns url """
     os.system('ngrok http 5000 > /dev/null &')
     url = "https://" + subprocess.check_output(r"""curl --silent --show-error http://127.0.0.1:4040/api/tunnels | sed -nE 's/.*public_url":"https:..([^"]*).*/\1/p'""", shell=True).decode('utf-8').strip('\n')
+    if url == 'https://':
+        logging.critical("Failure in obtaining ngrok url")
+        exit()
     return url
 
 if __name__ == '__main__':
     url = ngrok()
-    logging.info(f"Ngrok url obtained {url}")
+    logging.info(f"Ngrok url obtained - {url}")
     setWebhook(url)
     logging.info("Web app starting")
     app.run(threaded=True)
