@@ -27,9 +27,9 @@ def checkStocksThreaded(stock_ids : list) -> dict:
 
 def QuarterlyCheck(stock_datas=None):
     """ 15 minute check during trading hours to make sure stock price has not hit target """
+    stocklist = stockDB.stockList()
+    stock_ids = [stock_id for stock_id,_,_ in stocklist]
     if not stock_datas:
-        stocklist = stockDB.stockList()
-        stock_ids = [stock_id for stock_id,_,_ in stocklist]
         stock_datas = checkStocksThreaded(stock_ids)
     for stock_id,stock_trigger,trigger_type in stocklist:
         stock_data = stock_datas[stock_id]
