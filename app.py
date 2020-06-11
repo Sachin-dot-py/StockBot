@@ -2,6 +2,7 @@ from actions import *
 from credentials import token
 from loggingconfig import *
 import telegram
+import time
 import sys
 import os
 import subprocess
@@ -37,6 +38,7 @@ def ngrok():
     url = "https://" + subprocess.check_output(r"""curl --silent --show-error http://127.0.0.1:4040/api/tunnels | sed -nE 's/.*public_url":"https:..([^"]*).*/\1/p'""", shell=True).decode('utf-8').strip('\n')
     if url == 'https://':
         os.system('ngrok http 5000 > /dev/null &')
+        time.sleep(10)
         url = "https://" + subprocess.check_output(r"""curl --silent --show-error http://127.0.0.1:4040/api/tunnels | sed -nE 's/.*public_url":"https:..([^"]*).*/\1/p'""", shell=True).decode('utf-8').strip('\n')
     if url == 'https://':
         logging.critical("Failure in obtaining ngrok url")
