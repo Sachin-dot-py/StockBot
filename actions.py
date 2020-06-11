@@ -5,6 +5,7 @@ from yahoo_fin import stock_info as si
 from multiprocessing.pool import ThreadPool
 import telegram
 import logging
+import time
 
 bot = telegram.Bot(token=token)
 
@@ -141,6 +142,7 @@ def newMessage(message):
 
 if __name__ == "__main__":
     if len(sys.argv) == 2:
-        tradingMode()
+        if not (time.strftime("%H") == '21' and int(time.strftime("%M")) < 30):
+            tradingMode()
     else:
         QuarterlyCheck()
