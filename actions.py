@@ -64,6 +64,7 @@ def tradingMode():
         line = f"\n{stock_id} : ${stock_info[0]} , {'' if stock_info[1] < 0 else '+'}{stock_info[1]}%"
         message += line
     sendMessage(message)
+    logging.info("Trading mode check performed succesfully")
 
 def sendMessage(message,chat_id='1207015683'): # 1207015683, 855910557
     """ Send message via telegram to user """
