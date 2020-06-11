@@ -24,11 +24,12 @@ def checkStocksThreaded(stock_ids : list) -> dict:
         results = pool.map(checkStock, stock_ids)
     return dict(zip(stock_ids,results))
 
-def QuarterlyCheck():
+def QuarterlyCheck(stock_datas=None):
     """ 15 minute check during trading hours to make sure stock price has not hit target """
-    stocklist = stockDB.stockList()
-    stock_ids = [stock_id for stock_id,_,_ in stocklist]
-    stock_datas = checkStocksThreaded(stock_ids)
+    if not stock_datas:
+        stocklist = stockDB.stockList()
+        stock_ids = [stock_id for stock_id,_,_ in stocklist]
+        stock_datas = checkStocksThreaded(stock_ids)
     for stock_id,stock_trigger,trigger_type in stocklist:
         stock_data = stock_datas[stock_id]
         quote_price,percentage,volume,day_range = stock_data
@@ -52,6 +53,16 @@ def QuarterlyCheck():
             sendMessage(message)
             msgrecordDB.addMsgRecord(stock_id,trigger_type)
     logging.info("Performed quarterly stock price check")
+
+def tradingMode():
+    stock_ids = [stock_item[0] for stock_item in stockDB.stockList()]
+    stock_data = checkStocksThreaded(stock_ids)
+    QuarterlyCheck(stock_data)
+    message = "Stocks Report:\n\nStock ID - Stock Price - Increase/Decrease %"
+    for stock_id,stock_info in sorted(stock_data.items()):
+        line = f"\n{stock_id} : ${stock_info[0]} , {'' if stock_info[1] < 0 else '+'}{stock_info[1]}%"
+        message += line
+    sendMessage(message)
 
 def sendMessage(message,chat_id='1207015683'): # 1207015683, 855910557
     """ Send message via telegram to user """
@@ -129,4 +140,7 @@ def newMessage(message):
         sendMessage(f"Invalid command /{command}!")
 
 if __name__ == "__main__":
-    QuarterlyCheck()
+    if len(sys.argv) == 2:
+        tradingMode()
+    else:
+        QuarterlyCheck()
