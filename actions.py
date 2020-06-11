@@ -1,5 +1,6 @@
 from stockdb import stockDB,msgrecordDB
 from credentials import token
+from loggingconfig import *
 from yahoo_fin import stock_info as si
 from multiprocessing.pool import ThreadPool
 import telegram
@@ -112,6 +113,10 @@ def newMessage(message):
     elif command == 'run_check':
         QuarterlyCheck()
         sendMessage("Stock check ran succesfully!")
+    elif command == 'predictions_check':
+        from predictions import predictionsCheck
+        predictionsCheck()
+        sendMessage("Predictions check ran succesfully")
     elif command == 'get_stock':
         items = message.split()
         if len(items) != 2:

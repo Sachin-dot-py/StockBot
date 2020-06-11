@@ -1,23 +1,13 @@
 from actions import *
-from credentials import token,logfile
+from credentials import token
+from loggingconfig import *
 import telegram
-import logging
 import sys
 import os
 import subprocess
 import pandas as pd
 from flask import Flask, request
 
-def handle_unhandled_exception(exc_type, exc_value, exc_traceback):
-    """Handler for unhandled exceptions that will write to the log"""
-    if issubclass(exc_type, KeyboardInterrupt):
-        # call the default excepthook if it is a KeyboardInterrupt
-        print("Program interrupted by user")
-        return
-    logging.critical("", exc_info=(exc_type, exc_value, exc_traceback))
-
-logging.basicConfig(filename=logfile, format='%(asctime)s ~ %(levelname)s : %(message)s', datefmt='%d-%m-%Y %H:%M:%S',level=logging.INFO)
-sys.excepthook = handle_unhandled_exception
 bot = telegram.Bot(token=token)
 app = Flask(__name__)
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
