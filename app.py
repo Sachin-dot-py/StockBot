@@ -24,23 +24,6 @@ def respond():
     newMessage(text)
     return 'ok'
 
-@app.route('/check_predictions',methods=['POST'])
-def getPredictions():
-    """ Recieves predictions and checks if stocks in the watchlist are included in it """
-    request_data = request.get_json(force=True)
-    df = pd.read_json(request_data).drop('index',axis=1)
-    stocks = []
-    stocks_temp = stockDB.stockList()
-    for stock in stocks_temp:
-        stocks.append(stock[0].upper())
-    for result in df.values:
-        ticker = result[1]
-        if ticker.upper() in stocks:
-            message = f"Prediction for {result[0]} ({result[1]}):\nFirm: {result[2]}\nRatings Change: {result[3]}\nPrice Target: {result[4]}"
-            sendMessage(message)
-    logging.info('Predictions check ran succesfully!')
-    return 'ok'
-
 def setWebhook(url):
     """ Sets telegram webhook """
     s = bot.setWebhook('{URL}/{HOOK}'.format(URL=url, HOOK=token))
