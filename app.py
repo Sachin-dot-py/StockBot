@@ -35,11 +35,11 @@ def setWebhook(url):
 
 def ngrok():
     """ Starts ngrok and returns url """
-    url = "https://" + subprocess.check_output(r"""curl --silent --show-error http://127.0.0.1:4040/api/tunnels | sed -nE 's/.*public_url":"https:..([^"]*).*/\1/p'""", shell=True).decode('utf-8').strip('\n')
+    url = "https://" + subprocess.check_output(r"""curl --silent http://127.0.0.1:4040/api/tunnels | sed -nE 's/.*public_url":"https:..([^"]*).*/\1/p'""", shell=True).decode('utf-8').strip('\n')
     if url == 'https://':
         os.system('ngrok http 5000 > /dev/null &')
         time.sleep(10)
-        url = "https://" + subprocess.check_output(r"""curl --silent --show-error http://127.0.0.1:4040/api/tunnels | sed -nE 's/.*public_url":"https:..([^"]*).*/\1/p'""", shell=True).decode('utf-8').strip('\n')
+        url = "https://" + subprocess.check_output(r"""curl --silent http://127.0.0.1:4040/api/tunnels | sed -nE 's/.*public_url":"https:..([^"]*).*/\1/p'""", shell=True).decode('utf-8').strip('\n')
     if url == 'https://':
         logging.critical("Failure in obtaining ngrok url")
         exit()
@@ -51,3 +51,4 @@ if __name__ == '__main__':
     setWebhook(url)
     logging.info("Web app starting")
     app.run(threaded=True)
+    logging.warning('Web app stopped')
