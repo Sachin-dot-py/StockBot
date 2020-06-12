@@ -62,21 +62,21 @@ class PredictionRecordDB():
     def __init__(self):
         self.conn = sqlite3.connect("stocks.db", check_same_thread=False) 
         self.cur = self.conn.cursor()
-        self.conn.execute("""CREATE TABLE IF NOT EXISTS predictions (company_name TEXT, stock_id TEXT, ratings_change TEXT, price_target TEXT)""")
+        self.conn.execute("""CREATE TABLE IF NOT EXISTS predictions (company_name TEXT, stock_id TEXT, firm TEXT, ratings_change TEXT, price_target TEXT)""")
 
-    def addPredictionRecord(self, company_name : str, stock_id : str, ratings_change : str, price_target : str):
+    def addPredictionRecord(self, company_name : str, stock_id : str, firm : str, ratings_change : str, price_target : str):
         """ Adding the record of a sent alert """
-        self.conn.execute("""INSERT INTO predictions (company_name, stock_id, ratings_change, price_target) values (?,?,?,?)""", (company_name, stock_id, ratings_change, price_target))
+        self.conn.execute("""INSERT INTO predictions (company_name, stock_id, firm, ratings_change, price_target) values (?,?,?,?,?)""", (company_name, stock_id, firm, ratings_change, price_target))
         self.conn.commit()
 
-    def removePredictionRecord(self, company_name : str, stock_id : str, ratings_change : str, price_target : str):
+    def removePredictionRecord(self, company_name : str, stock_id : str, firm : str, ratings_change : str, price_target : str):
         """ Removing a record of a sent alert """
-        self.conn.execute("""DELETE FROM predictions WHERE company_name=? AND stock_id=? AND ratings_change=? AND price_target=?""", (company_name, stock_id, ratings_change, price_target))
+        self.conn.execute("""DELETE FROM predictions WHERE company_name=? AND stock_id=? AND firm=? AND ratings_change=? AND price_target=?""", (company_name, stock_id, firm, ratings_change, price_target))
         self.conn.commit()
 
-    def getPredictionRecord(self, company_name : str, stock_id : str, ratings_change : str, price_target : str) -> tuple:
+    def getPredictionRecord(self, company_name : str, stock_id : str, firm : str, ratings_change : str, price_target : str) -> tuple:
         """ Getting a single alert record """
-        record = self.conn.execute("""SELECT * FROM predictions WHERE company_name=? AND stock_id=? AND ratings_change=? AND price_target=?""",(company_name, stock_id, ratings_change, price_target)).fetchone()
+        record = self.conn.execute("""SELECT * FROM predictions WHERE company_name=? AND stock_id=? AND firm=? AND ratings_change=? AND price_target=?""",(company_name, stock_id, firm, ratings_change, price_target)).fetchone()
         return record
 
     def getPredictionRecords(self) -> list:
