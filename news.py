@@ -4,7 +4,6 @@ import requests
 from bs4 import BeautifulSoup
 import sqlite3
 import re
-import yfinance as yf
 from datetime import datetime, timedelta
 
 class NewsDB():
