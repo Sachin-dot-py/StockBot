@@ -6,6 +6,9 @@ import time
 import sys
 import os
 import subprocess
+import json
+import requests
+from bs4 import BeautifulSoup
 import pandas as pd
 from flask import Flask, request
 
@@ -35,14 +38,19 @@ def setWebhook(url):
 
 def ngrok():
     """ Starts ngrok and returns url """
-    url = "https://" + subprocess.check_output(r"""curl --silent http://127.0.0.1:4040/api/tunnels | sed -nE 's/.*public_url":"https:..([^"]*).*/\1/p'""", shell=True).decode('utf-8').strip('\n')
-    if url == 'https://':
+    try:
+        req = requests.get('http://127.0.0.1:4040/api/tunnels')
+    except:
         os.system('ngrok http 5000 > /dev/null &')
         time.sleep(10)
-        url = "https://" + subprocess.check_output(r"""curl --silent http://127.0.0.1:4040/api/tunnels | sed -nE 's/.*public_url":"https:..([^"]*).*/\1/p'""", shell=True).decode('utf-8').strip('\n')
-    if url == 'https://':
-        logging.critical("Failure in obtaining ngrok url")
-        exit()
+        try:
+            req = requests.get('http://127.0.0.1:4040/api/tunnels')
+        except:
+            logging.critical("Failure in obtaining ngrok url")
+            exit()
+    soup = BeautifulSoup(req.text, 'lxml')
+    tunnelsjson = json.loads(soup.find('p').text)
+    url = tunnelsjson['tunnels'][0]['public_url']
     return url
 
 if __name__ == '__main__':
