@@ -38,6 +38,7 @@ def setWebhook(url):
 
 def ngrok():
     """ Starts ngrok and returns url """
+    time.sleep(10)
     try:
         req = requests.get('http://127.0.0.1:4040/api/tunnels')
     except:
