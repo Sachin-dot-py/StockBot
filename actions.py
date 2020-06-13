@@ -1,4 +1,6 @@
 from stockdb import stockDB,msgrecordDB,predictionrecordDB
+from predictions import predictionsCheck
+from news import newsDB
 from credentials import token
 from loggingconfig import *
 from yahoo_fin import stock_info as si
@@ -127,9 +129,15 @@ def newMessage(message):
         QuarterlyCheck()
         sendMessage("Stock check ran succesfully!")
     elif command == 'predictions_check':
-        from predictions import predictionsCheck
         predictionsCheck()
         sendMessage("Predictions check ran succesfully")
+    elif command == 'get_news':
+        stock_list = [stock[0] for stock in stockDB.stockList()]
+        news_dict = newsDB.getAllNews(stock_list)
+        for stock_id,news in news_dict.items():
+            for news_one in news:
+                sendMessage(newsDB.formatNews(stock_id,news_one))
+        sendMessage("News check ran succesfully")
     elif command == 'get_stock':
         items = message.split()
         if len(items) != 2:
