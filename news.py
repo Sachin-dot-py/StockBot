@@ -5,6 +5,9 @@ from bs4 import BeautifulSoup
 import sqlite3
 import re
 from datetime import datetime, timedelta
+from nltk.stem import PorterStemmer,WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
 
 class NewsDB():
 
@@ -13,6 +16,18 @@ class NewsDB():
         self.cur = self.conn.cursor()
         r = requests.get('https://api.iextrading.com/1.0/ref-data/symbols')
         self.stock_symbols = r.json()
+        self.lemmatizer = WordNetLemmatizer() 
+        self.stopwords = set(stopwords.words('english'))
+        self.phrase_dict = {'work from home' : 100, 'takes a nosedive' : 100, 'take a nosedive' : 100}
+        self.point_dict = {'analyst' : 200, 'plummet' : 200, 'recover' : 50, 'recovery' : 50,
+        'capacity' : 200, 'impact' : 50, 'market' : 25, 'rebound' : 200, 'rebounding' : 200, 'contract' : 200, 'invest' : 200, 'investing' : 200, 
+        'stake' : 200, 'new' : 50, 'profit' : 200, 'profiting' : 200, 'loss' : 200, 'lost' : 200, 'losses' : 200, 'sale' : 200, 'purchase' : 200, 'bankrupt' : 200, 'peak' : 200, 
+        'high' : 200, 'low' : 200, 'crash' : 200, 'soar' : 200, 'stream' : 50, 'streaming' : 50, 'cloud' : 100, 'upgrade' : 200, 'downgrade' : 200, 'rate' : 200,
+        'positive' : 200, 'negative' : 200, 'cancel' : 200, 'blocked' : 100, 'deal' : 200, 'sign' : 200, 'benefit' : 200, 'under-value' : 50, 'undervalue' : 50,
+        'lower-value' : 50, 'lowervalue' : 50, 'depth' : 200, 'develop' : 200, 'developing' : 200, 'hit' : 200, 'opinion' : 200, 'work-from-home' : 200, 'fail' : 200, 'win' : 200,
+        'dip' : 200, 'trend' : 200, 'listing' : 200, 'decline' : 200, 'drop' : 200, 'collapse' : 200, 'boom' : 200, 'surge' : 200, 'steady' : 200, 'plunge' : 200, 'earning' : 200,
+        'license' : 50, 'join' : 100, 'complain' : 100, 'freeze' : 200, 'capability' : 200, 'production' : 100, 'potential' : 100, 'upside' : 100, 'outperform' : 200, 'significant' : 200,
+        'loan' : 100, 'provision' : 100, 'milestone' : 200, 'billion' : 200, 'million' : 200, 'releases' : 200, } 
 
     @staticmethod
     def formatNews(stock_id : str, news : tuple) -> str:
@@ -53,7 +68,19 @@ class NewsDB():
         self.conn.commit()
         
     def getImportant(self, stock_id : str, news : list) -> list:
-        return news[:1] # TODO
+        imp_news = []
+        for news_i in news:
+            points = 0
+            n = news_i[0]
+            for phrase, points_gained in self.phrase_dict.items():
+                if phrase in n.lower(): points += points_gained 
+            tokenized_words = word_tokenize(n.lower())
+            words = [self.lemmatizer.lemmatize(x) for x in tokenized_words if x not in self.stopwords and len(x) != 1]
+            for word in words:
+                points_gained = self.point_dict.get(word,None)
+                if points_gained: points += points_gained 
+            if points >= 100: imp_news.append(news_i)
+        return imp_news
 
     def getNews(self, stock_id):
         stock_name = self.getCompany(stock_id)
