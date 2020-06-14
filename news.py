@@ -11,14 +11,8 @@ class NewsDB():
     def __init__(self):
         self.conn = sqlite3.connect('news.db')
         self.cur = self.conn.cursor()
-
-    @staticmethod
-    def getCompany(stock_id : str) -> str:
         r = requests.get('https://api.iextrading.com/1.0/ref-data/symbols')
-        stock_list = r.json()
-        for stock in stock_list:
-            if stock['symbol'].upper() == stock_id.upper(): return stock['name'].replace('INC','').replace('LTD','').split('-')[0].title()
-        return stock_id
+        self.stock_symbols = r.json()
 
     @staticmethod
     def formatNews(stock_id : str, news : tuple) -> str:
@@ -42,6 +36,11 @@ class NewsDB():
             # news_dict = {'title' : title, 'link' : link, 'date' : date, 'source' : source, 'sourcelink' : sourcelink}
             news.append((title,link,date,source,sourcelink))
         return news
+
+    def getCompany(self, stock_id : str) -> str:
+        for stock in self.stock_symbols:
+            if stock['symbol'].upper() == stock_id.upper(): return stock['name'].replace('INC','').replace('LTD','').split('-')[0].title()
+        return stock_id
 
     def removeDuplicates(self, stock_id : str, news : list) -> list:
         self.conn.execute(f"""CREATE TABLE IF NOT EXISTS [{stock_id}] (title TEXT, link TEXT, date TEXT, source TEXT, sourcelink TEXT)""")
