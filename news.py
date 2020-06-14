@@ -27,7 +27,7 @@ class NewsDB():
 
     @staticmethod
     def getAllNews(stock_id : str) -> list:
-        link = f'https://news.google.com/rss/search?q={stock_id}'
+        link = f'https://news.google.com/rss/search?q={stock_id}+when:1d'
         req = requests.get(link)
         soup = BeautifulSoup(req.text,'lxml')
         items = soup.find_all('item')
