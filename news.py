@@ -67,7 +67,7 @@ class NewsDB():
     def getNewNews(self, stock_ids : list) -> dict:
         news_dict = dict()
         for stock_id in stock_ids:
-            news = self.checkNews(stock_id)
+            news = self.getNews(stock_id)
             news_dict[stock_id] = news
         return news_dict
         
