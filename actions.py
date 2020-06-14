@@ -133,7 +133,7 @@ def newMessage(message):
         sendMessage("Predictions check ran succesfully")
     elif command == 'get_news':
         stock_list = [stock[0] for stock in stockDB.stockList()]
-        news_dict = newsDB.getAllNews(stock_list)
+        news_dict = newsDB.getNewNews(stock_list)
         for stock_id,news in news_dict.items():
             for news_one in news:
                 sendMessage(newsDB.formatNews(stock_id,news_one))
