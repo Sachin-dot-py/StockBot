@@ -5,9 +5,10 @@ from bs4 import BeautifulSoup
 import sqlite3
 import re
 from datetime import datetime, timedelta
-from nltk.stem import PorterStemmer,WordNetLemmatizer
+from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
+import difflib
 
 class NewsDB():
 
@@ -35,26 +36,28 @@ class NewsDB():
         return message
 
     @staticmethod
-    def getAllNews(stock_id : str) -> list:
-        link = f'https://news.google.com/rss/search?q={stock_id}+when:1d'
-        req = requests.get(link)
-        soup = BeautifulSoup(req.text,'lxml')
-        items = soup.find_all('item')
+    def getAllNews(stock_id : str, stock_name : str) -> list:
         news = []
-        for item in items:
-            title = item.find('title').text
-            link = item.contents[2].strip()
-            date = datetime.strftime(datetime.strptime(item.find('pubdate').text, "%a, %d %b %Y %H:%M:%S GMT") + timedelta(hours=8),"%A, %d %B %Y %H:%M:%S")
-            description = item.find('description').text
-            source = item.find('source').text
-            sourcelink = item.find('source')['url']
-            # news_dict = {'title' : title, 'link' : link, 'date' : date, 'source' : source, 'sourcelink' : sourcelink}
-            news.append((title,link,date,source,sourcelink))
+        for i in [stock_id, stock_name]:
+            link = f'https://news.google.com/rss/search?q={i}+when:1d'
+            req = requests.get(link)
+            soup = BeautifulSoup(req.text,'lxml')
+            items = soup.find_all('item')
+            for item in items:
+                title = item.find('title').text
+                link = item.contents[2].strip()
+                date_obj = datetime.strptime(item.find('pubdate').text, "%a, %d %b %Y %H:%M:%S GMT") + timedelta(hours=8)
+                date = datetime.strftime(date_obj, "%A, %d %B %Y %H:%M:%S")
+                description = item.find('description').text
+                source = item.find('source').text
+                sourcelink = item.find('source')['url']
+                # news_dict = {'title' : title, 'link' : link, 'date' : date, 'source' : source, 'sourcelink' : sourcelink}
+                if date_obj > datetime.now() - timedelta(hours=24) : news.append((title,link,date,source,sourcelink))
         return news
 
     def getCompany(self, stock_id : str) -> str:
         for stock in self.stock_symbols:
-            if stock['symbol'].upper() == stock_id.upper(): return stock['name'].replace('INC','').replace('LTD','').split('-')[0].title()
+            if stock['symbol'].upper() == stock_id.upper(): return stock['name'].replace('INC','').replace('LTD','').split('-')[0].title().strip()
         return stock_id
 
     def removeDuplicates(self, stock_id : str, news : list) -> list:
@@ -67,7 +70,7 @@ class NewsDB():
         self.conn.executemany(f"""INSERT INTO [{stock_id}] VALUES (?,?,?,?,?)""", news)
         self.conn.commit()
         
-    def getImportant(self, stock_id : str, news : list) -> list:
+    def getImportant(self, stock_id : str, stock_name : str, news : list) -> list:
         imp_news = []
         for news_i in news:
             points = 0
@@ -80,14 +83,25 @@ class NewsDB():
                 points_gained = self.point_dict.get(word,None)
                 if points_gained: points += points_gained 
             if points >= 100: imp_news.append(news_i)
-        return imp_news
+        news_imp = []
+        for news in imp_news:
+            ratios = []
+            ns = news[0].split()
+            for n in ns:
+                match1 = difflib.SequenceMatcher(None, n.lower(), stock_id.lower()).ratio()
+                match2 = difflib.SequenceMatcher(None, n.lower(), stock_name.lower()).ratio()
+                max_match = max((match1, match2))
+                ratios.append(max_match)
+            match_ratio = max(ratios)
+            if match_ratio >= 0.5: news_imp.append(news)       
+        return news_imp
 
     def getNews(self, stock_id):
         stock_name = self.getCompany(stock_id)
-        news = self.getAllNews(stock_name)
+        news = self.getAllNews(stock_id, stock_name)
         news = self.removeDuplicates(stock_id, news)
         self.addNews(stock_id, news)
-        news = self.getImportant(stock_id, news)
+        news = self.getImportant(stock_id, stock_name, news)
         return news
 
     def getNewNews(self, stock_ids : list) -> dict:
