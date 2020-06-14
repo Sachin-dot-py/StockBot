@@ -131,7 +131,7 @@ def newMessage(message):
     elif command == 'predictions_check':
         predictionsCheck()
         sendMessage("Predictions check ran succesfully")
-    elif command == 'get_news':
+    elif command == 'news_check':
         stock_list = [stock[0] for stock in stockDB.stockList()]
         news_dict = newsDB.getNewNews(stock_list)
         for stock_id,news in news_dict.items():
