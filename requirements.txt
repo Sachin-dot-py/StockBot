@@ -7,9 +7,12 @@ Flask == 1.1.2
 # StockBotv2/news.py: 4
 beautifulsoup4 == 4.6.0
 
+# StockBotv2/news.py: 8,9,10
+nltk == 3.5
+
 # StockBotv2/app.py: 12
 # StockBotv2/predictions.py: 2
-pandas == 1.0.3
+pandas == 1.0.4
 
 # StockBotv2/actions.py: 8
 # StockBotv2/app.py: 4
