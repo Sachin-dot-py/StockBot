@@ -26,7 +26,7 @@ class NewsDB():
         return message
 
     @staticmethod
-    def getNews(stock_id : str) -> list:
+    def getAllNews(stock_id : str) -> list:
         link = f'https://news.google.com/rss/search?q={stock_id}'
         req = requests.get(link)
         soup = BeautifulSoup(req.text,'lxml')
@@ -35,36 +35,36 @@ class NewsDB():
         for item in items:
             title = item.find('title').text
             link = item.contents[2].strip()
-            date = datetime.strftime(datetime.strptime(item.find('pubdate').text, "%a, %d %b %Y %H:%M:%S GMT") + timedelta(hours=9),"%A, %d %B %Y %H:%M:%S")
+            date = datetime.strftime(datetime.strptime(item.find('pubdate').text, "%a, %d %b %Y %H:%M:%S GMT") + timedelta(hours=8),"%A, %d %B %Y %H:%M:%S")
             description = item.find('description').text
             source = item.find('source').text
             sourcelink = item.find('source')['url']
-            # news_dict = {'title' : title, 'link' : link, 'date' : date, 'description' : description, 'source' : source, 'sourcelink' : sourcelink}
-            news.append((title,link,date,description,source,sourcelink))
+            # news_dict = {'title' : title, 'link' : link, 'date' : date, 'source' : source, 'sourcelink' : sourcelink}
+            news.append((title,link,date,source,sourcelink))
         return news
 
     def removeDuplicates(self, stock_id : str, news : list) -> list:
-        self.conn.execute(f"""CREATE TABLE IF NOT EXISTS [{stock_id}] (title TEXT, link TEXT, date TEXT, description TEXT, source TEXT, sourcelink TEXT)""")
-        news = [news_record for news_record in news if not self.conn.execute(f"""SELECT * FROM [{stock_id}] WHERE title=? AND link=? AND date=? AND description=? AND source=? AND sourcelink=?""", news_record).fetchone()]
+        self.conn.execute(f"""CREATE TABLE IF NOT EXISTS [{stock_id}] (title TEXT, link TEXT, date TEXT, source TEXT, sourcelink TEXT)""")
+        news = [news_record for news_record in news if not self.conn.execute(f"""SELECT * FROM [{stock_id}] WHERE title=? AND source=?""", (news_record[0], news_record[3])).fetchone()]
         return news
 
     def addNews(self, stock_id : str, news : list):
-        self.conn.execute(f"""CREATE TABLE IF NOT EXISTS [{stock_id}] (title TEXT, link TEXT, date TEXT, description TEXT, source TEXT, sourcelink TEXT)""")
-        self.conn.executemany(f"""INSERT INTO [{stock_id}] VALUES (?,?,?,?,?,?)""", news)
+        self.conn.execute(f"""CREATE TABLE IF NOT EXISTS [{stock_id}] (title TEXT, link TEXT, date TEXT, source TEXT, sourcelink TEXT)""")
+        self.conn.executemany(f"""INSERT INTO [{stock_id}] VALUES (?,?,?,?,?)""", news)
         self.conn.commit()
         
     def getImportant(self, stock_id : str, news : list) -> list:
         return news[:1] # TODO
 
-    def checkNews(self, stock_id):
+    def getNews(self, stock_id):
         stock_name = self.getCompany(stock_id)
-        news = self.getNews(stock_name)
+        news = self.getAllNews(stock_name)
         news = self.removeDuplicates(stock_id, news)
         self.addNews(stock_id, news)
         news = self.getImportant(stock_id, news)
         return news
 
-    def getAllNews(self, stock_ids : list) -> dict:
+    def getNewNews(self, stock_ids : list) -> dict:
         news_dict = dict()
         for stock_id in stock_ids:
             news = self.checkNews(stock_id)
@@ -75,7 +75,7 @@ newsDB = NewsDB()
 
 if __name__ == "__main__":
     stock_list = [stock[0] for stock in stockDB.stockList()]
-    news_dict = newsDB.getAllNews(stock_list)
+    news_dict = newsDB.getNewNews(stock_list)
     for stock_id,news in news_dict.items():
         for news_one in news:
             sendMessage(newsDB.formatNews(stock_id,news_one))
