@@ -51,7 +51,7 @@ def ngrok():
             exit()
     soup = BeautifulSoup(req.text, 'lxml')
     tunnelsjson = json.loads(soup.find('p').text)
-    url = tunnelsjson['tunnels'][0]['public_url']
+    url = tunnelsjson['tunnels'][0]['public_url'].replace('http://','https://')
     return url
 
 if __name__ == '__main__':
