@@ -156,7 +156,7 @@ def newMessage(message):
         else:
             newstriggerDB.removeTrigger(items[1])
             sendMessage(f"{items[1]} succesfully removed from keywords")
-    elif command == 'change_trigger':
+    elif command == 'change_keyword':
         items = message.split()
         if len(items) != 3:
             sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/change_keyword breakthrough 200")
