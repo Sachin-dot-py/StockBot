@@ -138,37 +138,37 @@ def newMessage(message):
             for news_one in news:
                 sendMessage(newsDB.formatNews(stock_id,news_one))
         sendMessage("News check ran succesfully")
-    elif command == 'add_trigger':
+    elif command == 'add_keyword':
         items = message.split()
         if len(items) != 3:
-            sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/add_trigger breakthrough 200")
+            sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/add_keyword breakthrough 200")
         else:
             try:
                 points = int(items[2])
                 newstriggerDB.addTrigger(items[1],points)
-                sendMessage(f"{items[1]} succesfully added to triggers for {items[2]} points!")
+                sendMessage(f"{items[1]} succesfully added to keyword for {items[2]} points!")
             except:
                 sendMessage(f"Points should be an integer but got {items[2]} instead")
-    elif command == 'remove_trigger':
+    elif command == 'remove_keyword':
         items = message.split()
         if len(items) != 2:
-            sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/remove_trigger breakthrough")
+            sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/remove_keyword breakthrough")
         else:
             newstriggerDB.removeTrigger(items[1])
-            sendMessage(f"{items[1]} succesfully removed from triggers")
+            sendMessage(f"{items[1]} succesfully removed from keywords")
     elif command == 'change_trigger':
         items = message.split()
         if len(items) != 3:
-            sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/change_trigger breakthrough 200")
+            sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/change_keyword breakthrough 200")
         else:
             try:
                 points = int(items[2])
                 newstriggerDB.removeTrigger(items[1])
                 newstriggerDB.addTrigger(items[1], items[2])
-                sendMessage(f"{items[1]} succesfully changed from triggers for {items[2]} points!")
+                sendMessage(f"{items[1]} succesfully changed from keyword for {items[2]} points!")
             except:
                 sendMessage(f"Points should be an integer but got {items[2]} instead")
-    elif command == 'list_triggers':
+    elif command == 'list_keyword':
         items = message.split()
         triggers = newstriggerDB.getAllTriggers()
         message = "Trigger\t-\tPoints\n"
