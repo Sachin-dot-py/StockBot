@@ -11,7 +11,7 @@ class DB():
         self.conn.commit()
 
     def get(self, query : str):
-        results = self.conn.execute(query)
+        results = self.conn.execute(query).fetchall()
         self.conn.commit()
         return results
 
