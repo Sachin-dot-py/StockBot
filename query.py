@@ -1,10 +1,10 @@
 import sqlite3
 
 class DB():
-    
+
     def __init__(self, db : str):
         self.conn = sqlite3.connect(db)
-        self.cur = conn.cursor()
+        self.cur = self.conn.cursor()
 
     def run(self, query : str):
         self.conn.execute(query)
