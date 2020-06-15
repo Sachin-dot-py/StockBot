@@ -1,6 +1,6 @@
 from stockdb import stockDB,msgrecordDB,predictionrecordDB
 from predictions import predictionsCheck
-from news import newsDB
+from news import newsDB,newstriggerDB
 from credentials import token
 from loggingconfig import *
 from yahoo_fin import stock_info as si
@@ -80,7 +80,7 @@ def newMessage(message):
         sendMessage(f"'{message}' is not a valid command.\nType /help for more info")
         return
     if command == 'help':
-        sendMessage("Welcome to the Stock bot!\n\nList of commands:\n1. /help - Show this message and exit.\n2. /add_stock - Add a stock to the watch list.\n3. /remove_stock - Remove a stock from the watch list.\n4. /list_stock - Lists all stock and trigger prices in the watchlist\n5. /report - Get a report of the prices of the stocks in your Watchlist\n6. /get_stock - Check the details of any stock\n7. /run_check - Checks if stocks have gone past trigger price")
+        sendMessage("Welcome to the Stock bot!\nMade by Sachin Ramanathan")
     elif command == 'add_stock':
         items = message.split()
         if len(items) != 4 or (items[3].lower() != 'buy' and items[3].lower() != 'sell'):
@@ -138,6 +138,43 @@ def newMessage(message):
             for news_one in news:
                 sendMessage(newsDB.formatNews(stock_id,news_one))
         sendMessage("News check ran succesfully")
+    elif command == 'add_trigger':
+        items = message.split()
+        if len(items) != 3:
+            sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/add_trigger breakthrough 200")
+        else:
+            try:
+                points = int(items[2])
+                newstriggerDB.addTrigger(items[1],points)
+                sendMessage(f"{items[1]} succesfully added to triggers for {items[2]} points!")
+            except:
+                sendMessage(f"Points should be an integer but got {items[2]} instead")
+    elif command == 'remove_trigger':
+        items = message.split()
+        if len(items) != 2:
+            sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/remove_trigger breakthrough")
+        else:
+            newstriggerDB.removeTrigger(items[1])
+            sendMessage(f"{items[1]} succesfully removed from triggers")
+    elif command == 'change_trigger':
+        items = message.split()
+        if len(items) != 3:
+            sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/change_trigger breakthrough 200")
+        else:
+            try:
+                points = int(items[2])
+                newstriggerDB.removeTrigger(items[1])
+                newstriggerDB.addTrigger(items[1], items[2])
+                sendMessage(f"{items[1]} succesfully changed from triggers for {items[2]} points!")
+            except:
+                sendMessage(f"Points should be an integer but got {items[2]} instead")
+    elif command == 'list_triggers':
+        items = message.split()
+        triggers = newstriggerDB.getAllTriggers()
+        message = "Trigger\t-\tPoints\n"
+        for trigger,points in triggers:
+            message += f"{trigger}\t-\t{points}\n"
+        sendMessage(message)
     elif command == 'get_stock':
         items = message.split()
         if len(items) != 2:

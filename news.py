@@ -10,6 +10,33 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 import difflib
 
+class NewsTriggerDB():
+
+    def __init__(self):
+        self.conn = sqlite3.connect('stocks.db')
+        self.cur = self.conn.cursor()
+        self.conn.execute("""CREATE TABLE IF NOT EXISTS news_triggers (trigger TEXT, points REAL)""")
+
+    def addTrigger(self, trigger : str, points : int):
+        points = self.getTriggerPts(trigger)
+        if points:
+            self.conn.execute("""UPDATE news_triggers SET points=? WHERE trigger=?""", (points,trigger))
+        else:
+            self.conn.execute("""INSERT INTO news_triggers values(?,?)""", (trigger,points))
+        self.conn.commit()
+
+    def removeTrigger(self, trigger : str):
+        self.conn.execute("""DELETE FROM news_triggers WHERE trigger=?""",(trigger,))
+        self.conn.commit()
+
+    def getTriggerPts(self, trigger : str) -> int:
+        points = self.conn.execute("""SELECT * FROM news_triggers WHERE trigger=?""",(trigger,)).fetchone()
+        return points
+
+    def getAllTriggers(self) -> list:
+        triggers = self.conn.execute("""SELECT * FROM news_triggers""").fetchall()
+        return triggers
+
 class NewsDB():
 
     def __init__(self):
@@ -20,16 +47,8 @@ class NewsDB():
         self.lemmatizer = WordNetLemmatizer() 
         self.stopwords = set(stopwords.words('english'))
         self.phrase_dict = {'work from home' : 100, 'takes a nosedive' : 100, 'take a nosedive' : 100}
-        self.point_dict = {'analyst' : 200, 'plummet' : 200, 'recover' : 50, 'recovery' : 50,
-        'capacity' : 200, 'impact' : 50, 'market' : 25, 'rebound' : 200, 'rebounding' : 200, 'contract' : 200, 'invest' : 200, 'investing' : 200, 
-        'stake' : 200, 'new' : 50, 'profit' : 200, 'profiting' : 200, 'loss' : 200, 'lost' : 200, 'losses' : 200, 'sale' : 200, 'purchase' : 200, 'bankrupt' : 200, 'peak' : 200, 
-        'high' : 200, 'low' : 200, 'crash' : 200, 'soar' : 200, 'stream' : 50, 'streaming' : 50, 'cloud' : 100, 'upgrade' : 200, 'downgrade' : 200, 'rate' : 200,
-        'positive' : 200, 'negative' : 200, 'cancel' : 200, 'blocked' : 100, 'deal' : 200, 'sign' : 200, 'benefit' : 200, 'under-value' : 50, 'undervalue' : 50,
-        'lower-value' : 50, 'lowervalue' : 50, 'depth' : 200, 'develop' : 200, 'developing' : 200, 'hit' : 200, 'opinion' : 200, 'work-from-home' : 200, 'fail' : 200, 'win' : 200,
-        'dip' : 200, 'trend' : 200, 'listing' : 200, 'decline' : 200, 'drop' : 200, 'collapse' : 200, 'boom' : 200, 'surge' : 200, 'steady' : 200, 'plunge' : 200, 'earning' : 200,
-        'license' : 50, 'join' : 100, 'complain' : 100, 'freeze' : 200, 'capability' : 200, 'production' : 100, 'potential' : 100, 'upside' : 100, 'outperform' : 200, 'significant' : 200,
-        'loan' : 100, 'provision' : 100, 'milestone' : 200, 'billion' : 200, 'million' : 200, 'releases' : 200, } 
-
+        self.point_dict = dict(NewsTriggerDB().getAllTriggers())
+        
     @staticmethod
     def formatNews(stock_id : str, news : tuple) -> str:
         message = f"""News for {stock_id}:\n{news[2]}\n{news[1]}"""
@@ -112,6 +131,7 @@ class NewsDB():
         return news_dict
         
 newsDB = NewsDB()
+newstriggerDB = NewsTriggerDB()
 
 if __name__ == "__main__":
     stock_list = [stock[0] for stock in stockDB.stockList()]
