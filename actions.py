@@ -148,7 +148,7 @@ def newMessage(message):
                 newstriggerDB.addTrigger(items[1],points)
                 sendMessage(f"{items[1]} succesfully added to keyword for {items[2]} points!")
             except:
-                sendMessage(f"Points should be an integer but got {items[2]} instead")
+                sendMessage(f"Sorry, your keyword was not added, possibly because the keyword already exists, or was not an integer.")
     elif command == 'remove_keyword':
         items = message.split()
         if len(items) != 2:
