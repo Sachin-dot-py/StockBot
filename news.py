@@ -13,7 +13,7 @@ import difflib
 class NewsDB():
 
     def __init__(self):
-        self.conn = sqlite3.connect('news.db')
+        self.conn = sqlite3.connect('news.db', check_same_thread=False)
         self.cur = self.conn.cursor()
         r = requests.get('https://api.iextrading.com/1.0/ref-data/symbols')
         self.stock_symbols = r.json()
