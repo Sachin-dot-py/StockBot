@@ -41,17 +41,20 @@ def ngrok():
     time.sleep(10)
     try:
         req = requests.get('http://127.0.0.1:4040/api/tunnels')
+        soup = BeautifulSoup(req.text, 'lxml')
+        tunnelsjson = json.loads(soup.find('p').text)
+        url = tunnelsjson['tunnels'][0]['public_url'].replace('http://','https://')
     except:
         os.system('ngrok http 5000 > /dev/null &')
         time.sleep(10)
         try:
             req = requests.get('http://127.0.0.1:4040/api/tunnels')
+            soup = BeautifulSoup(req.text, 'lxml')
+            tunnelsjson = json.loads(soup.find('p').text)
+            url = tunnelsjson['tunnels'][0]['public_url'].replace('http://','https://')
         except:
             logging.critical("Failure in obtaining ngrok url")
             exit()
-    soup = BeautifulSoup(req.text, 'lxml')
-    tunnelsjson = json.loads(soup.find('p').text)
-    url = tunnelsjson['tunnels'][0]['public_url'].replace('http://','https://')
     return url
 
 if __name__ == '__main__':
