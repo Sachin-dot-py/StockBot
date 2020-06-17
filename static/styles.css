@@ -1,0 +1,42 @@
+body{
+    background-color: #F7DB4F;
+    font-family: Platform, Flash, Noteworthy, Helvetica;
+}
+footer{
+    text-align: right;
+}
+.flex-container {
+  display: flex;
+  flex-flow: row wrap;
+  /* background-color: DodgerBlue; */
+}
+
+.flex-container > div {
+  /* background-color: #f1f1f1; */
+  width: 122px;
+  height: 100px;
+  margin: 10px;
+}
+.stock_id{
+    display: inline-block;
+    font-size: 120%;
+    text-align: center;
+    vertical-align: middle;
+    height: 50%;
+    width: 100%;
+}
+.stock_price{
+    display: inline-block;
+    font-size : 80%;
+    vertical-align: bottom;
+    float: left; /* Necessary */
+    height: 50%;
+    width: 60%;
+}
+.stock_percentage{
+    display: inline-block;
+    font-size: 80%;
+    vertical-align: bottom;
+    height: 50%;
+    width: 40%;
+}

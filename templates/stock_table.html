@@ -1,0 +1,14 @@
+<div class="flex-container" onload="cellColor()">
+{% for stock_id,stockdata in stock_data.items() %}
+    <div class="stock-data">
+    <br>
+    <span class="stock_id">{{ stock_id }}</span>
+    <br>
+    <span class="stock_price">&nbsp;${{ stockdata[0] }}</span>
+    <span class="stock_percentage">{{ "+" if stockdata[1] >= 0}}{{ stockdata[1] }}</span>
+    </div>
+{% endfor %}
+</div>
+<br>
+<input type="button" id="stock_update" value="Update Table" onclick="updateTable()"></input>
+<footer>Last updated : {{ updated_time }}</footer>

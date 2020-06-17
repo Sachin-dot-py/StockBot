@@ -10,7 +10,7 @@ import json
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-from flask import Flask, request
+from flask import Flask, request, render_template
 
 bot = telegram.Bot(token=token)
 app = Flask(__name__)
@@ -21,12 +21,28 @@ def respond():
     """ Parses telegram update """
     update = telegram.Update.de_json(request.get_json(force=True), bot)
     chat_id = update.message.chat.id
-    msg_id = update.message.message_id
     text = update.message.text.encode('utf-8').decode()
     logging.info(f"Recieved message {text}")
     if str(chat_id) not in ['855910557','1207015683'] : return
     newMessage(text)
     return 'ok'
+
+@app.route('/')
+def index():
+    logging.info("Stock Dashboard session started")
+    return render_template('index.html')
+
+@app.route('/stock_data')
+def stockdata():
+    stock_list = [stock[0] for stock in stockDB.stockList()]
+    stock_data = checkStocksThreaded(stock_list)
+    updated_time = time.strftime("%H:%M:%S")
+    logging.info("Updated dashboard stock data")
+    return render_template('stock_table.html', stock_data=stock_data, updated_time=updated_time)
+
+@app.route('/favicon.ico')
+def favicon():
+    return app.send_static_file('favicon.ico')
 
 def setWebhook(url):
     """ Sets telegram webhook """
