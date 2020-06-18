@@ -4,12 +4,12 @@
 
 ## Getting started
 - Clone this repo to your computer
-- Install the requirements using ```python3 pip3 install -r requirements.txt```
+- Install the requirements using ```pip3 install -r requirements.txt```
 - Create a credentials.py file in the below format:
 ```python3
-url = 'SITE_URL'
 logfile = 'LOG_FILE_NAME'
 token = 'TELEGRAM_TOKEN'
+chat_id = 'CHAT_ID'
 ```
-- Type ```flask run``` and to start the app
+- Type ```flask run --host=0.0.0.0``` and to start the app
 - You're all set!
