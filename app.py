@@ -30,14 +30,30 @@ def index():
     logging.info("Stock Dashboard session started")
     return render_template('index.html')
 
+@app.route('/stock_news')
+def stocknews():
+    news = ''
+    link = 'https://news.google.com/rss' # Change
+    req = requests.get(link)
+    soup = BeautifulSoup(req.text,'lxml')
+    items = soup.find_all('item')
+    for item in items:
+        title = item.find('title').text
+        news += f"{title} | "
+    return news
+
 @app.route('/stock_data')
 def stockdata():
+    indexes = ['^DJI', '^IXIC', '^GSPC']
+    index_names = ['Dow Jones', 'Nasdaq', 'S&P 500']
+    index_data = checkStocksThreaded(indexes).values()
+    index_datas = dict(zip(index_names, index_data))
     stockDB = StockDB()
     stock_list = [stock[0] for stock in stockDB.stockList()]
     stock_data = checkStocksThreaded(stock_list)
     updated_time = time.strftime("%H:%M:%S")
     logging.info("Updated dashboard stock data")
-    return render_template('stock_table.html', stock_data=stock_data, updated_time=updated_time)
+    return render_template('stock_table.html', stock_data=stock_data, updated_time=updated_time, index_datas=index_datas)
 
 @app.route('/favicon.ico')
 def favicon():
@@ -53,7 +69,6 @@ def setWebhook(url):
 
 def ngrok():
     """ Starts ngrok and returns url """
-    time.sleep(10)
     try:
         req = requests.get('http://127.0.0.1:4040/api/tunnels')
         soup = BeautifulSoup(req.text, 'lxml')

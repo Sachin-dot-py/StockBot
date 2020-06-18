@@ -9,6 +9,7 @@ function updateTable() {
         cellColor();
         document.querySelector("#loader").style.display = "none"; 
         document.querySelector("body").style.visibility = "visible"; 
+        updateNews()
       },
       error: function(xhr) {
         console.log("Error updating table. Trying again after 2 minutes...")
@@ -19,7 +20,7 @@ function cellColor(){
   console.log("Setting cell colors...")
   var cells = document.getElementsByClassName("stock-data");
   for (var i = 0; i < cells.length; i++) {
-      if (parseInt(cells[i].getElementsByClassName('stock_percentage')[0].innerHTML) >= 0) {
+      if (parseInt(cells[i].getElementsByClassName('stock_percentage')[0].innerHTML.replace('%','')) >= 0) {
           cells[i].style.backgroundColor = "#90ee90";
       }
       else{
@@ -28,7 +29,22 @@ function cellColor(){
   }
   console.log("Cell colors set!")
 }
+function updateNews() {  
+  console.log("Getting news...")
+    $.ajax({
+      url: "/stock_news",
+      type: "get",
+      success: function(response) {
+        $("#news").html(response);
+        console.log("News updated!");
+      },
+      error: function(xhr) {
+        console.log("Error updating news. Trying again after 2 minutes...")
+      }
+    });
+}
 function load(){
   console.log("Loading page...")
+  updateTable()
   setInterval(updateTable, 120 * 1000);
 }

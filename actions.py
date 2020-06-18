@@ -15,7 +15,10 @@ bot = telegram.Bot(token=token)
 
 def checkStock(stock_id):
     """ Checks price of stock from Yahoo! Finance """
-    stock = si.get_quote_table(stock_id, dict_result = True)
+    try:
+        stock = si.get_quote_table(stock_id, dict_result = True)
+    except:
+        stock = si.get_quote_table(stock_id, dict_result = True)
     quote_price = round(stock['Quote Price'],2)
     close_price = stock['Previous Close']
     percentage = round(((quote_price-close_price)/close_price)*100,2)

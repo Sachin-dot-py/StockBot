@@ -57,7 +57,7 @@ class NewsDB():
         return message
 
     @staticmethod
-    def getAllNews(stock_id : str, stock_name : str) -> list:
+    def getAllNews(stock_id : str) -> list:
         news = []
         link = f'https://news.google.com/rss/search?q={f"{stock_id} stock news"}'
         req = requests.get(link)
@@ -119,7 +119,7 @@ class NewsDB():
 
     def getNews(self, stock_id):
         stock_name = self.getCompany(stock_id)
-        news = self.getAllNews(stock_id, stock_name)
+        news = self.getAllNews(stock_id)
         news = self.removeDuplicates(stock_id, news)
         self.addNews(stock_id, news)
         news = self.getImportant(stock_id, stock_name, news)
