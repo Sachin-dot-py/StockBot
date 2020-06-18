@@ -11,8 +11,7 @@ function updateTable() {
         document.querySelector("body").style.visibility = "visible"; 
       },
       error: function(xhr) {
-        console.log("Error updating table. Trying again...")
-        updateTable()
+        console.log("Error updating table. Trying again after 2 minutes...")
       }
     });
 }

@@ -22,7 +22,7 @@ class StockDB():
     def changeStock(self, stock_id : str, new_trigger : int, trigger_type : str):
         """ Changes the trigger value and type of a stock from the database"""
         self.conn.execute("""UPDATE stocklist SET stock_trigger=? WHERE stock_id=?, trigger_type=? """,(new_trigger,stock_id,trigger_type))
-        conn.commit()
+        self.conn.commit()
 
     def stockList(self) -> list:
         """ Lists all stocks in the database """
