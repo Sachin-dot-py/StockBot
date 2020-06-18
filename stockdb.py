@@ -27,7 +27,7 @@ class StockDB():
     def stockList(self) -> list:
         """ Lists all stocks in the database """
         stocks = self.conn.execute("""SELECT * FROM stocklist""").fetchall()
-        return stocks
+        return sorted(stocks)
 
 class MsgRecordDB():
     """ Managing records of previous alert sent by run_check """

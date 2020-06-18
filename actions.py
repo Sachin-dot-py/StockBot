@@ -1,7 +1,7 @@
 from stockdb import StockDB,MsgRecordDB,PredictionRecordDB
 from predictions import predictionsCheck
 from news import NewsDB,NewsTriggerDB
-from credentials import token
+from credentials import token, CHAT_ID
 from loggingconfig import logging
 from yahoo_fin import stock_info as si
 from multiprocessing.pool import ThreadPool
@@ -71,7 +71,9 @@ def tradingMode():
     sendMessage(message)
     logging.info("Trading mode check performed succesfully")
 
-def sendMessage(message,chat_id='1207015683'): # 1207015683, 855910557
+def sendMessage(message,chat_id=None): # 1207015683, 855910557
+    if not chat_id:
+        chat_id = CHAT_ID
     """ Send message via telegram to user """
     bot.sendMessage(chat_id=chat_id,text=message)
 

@@ -1,8 +1,9 @@
 from selenium import webdriver
 import pandas as pd
-from actions import sendMessage
 from stockdb import StockDB, PredictionRecordDB
 from loggingconfig import logging
+if __name__ != "predictions":
+    from actions import sendMessage
 
 def getPredictions():
     options = webdriver.ChromeOptions()

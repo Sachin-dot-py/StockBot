@@ -1,5 +1,4 @@
 from loggingconfig import logging
-from actions import sendMessage
 from stockdb import StockDB
 import requests
 from bs4 import BeautifulSoup
@@ -10,6 +9,8 @@ from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 import difflib
+if __name__ != "news":
+    from actions import sendMessage
 
 class NewsTriggerDB():
 
