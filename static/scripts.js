@@ -20,7 +20,7 @@ function cellColor(){
   console.log("Setting cell colors...");
   var cells = document.getElementsByClassName("stock-data");
   for (var i = 0; i < cells.length; i++) {
-      if (parseInt(cells[i].getElementsByClassName('stock_percentage')[0].innerHTML.replace('%','')) >= 0) {
+      if (parseFloat(cells[i].getElementsByClassName('stock_percentage')[0].innerHTML.replace('%','')) >= 0) {
           cells[i].style.backgroundColor = "#90ee90";
       }
       else{
