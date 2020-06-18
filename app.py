@@ -87,12 +87,15 @@ def ngrok():
             exit()
     return url
 
-@app.before_first_request
-def init():
+def create_app():
+    app = Flask(__name__)
     url = ngrok()
     logging.info(f"Ngrok url obtained - {url}")
     setWebhook(url)
     logging.info("Web app starting")
+    return app
+
+app = create_app()
 
 if __name__ == '__main__':
     app.run(threaded=True)
