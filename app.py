@@ -87,10 +87,10 @@ def ngrok():
             exit()
     return url
 
+url = ngrok()
+logging.info(f"Ngrok url obtained - {url}")
+setWebhook(url)
+logging.info("Web app starting")
+
 if __name__ == '__main__':
-    url = ngrok()
-    logging.info(f"Ngrok url obtained - {url}")
-    setWebhook(url)
-    logging.info("Web app starting")
-    app.run(threaded=True)
-    logging.warning('Web app stopped')
+    app.run(port=4000,threaded=True)
