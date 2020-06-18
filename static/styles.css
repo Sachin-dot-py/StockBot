@@ -6,6 +6,7 @@ footer{
     text-align: right;
 }
 .news {
+    font-family: Arial, Helvetica, sans-serif;
     font-size:1.5em;
     line-height:0.8em;
     color:black;
