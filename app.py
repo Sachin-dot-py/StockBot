@@ -1,15 +1,13 @@
-from actions import *
+from actions import newMessage, sendMessage, checkStocksThreaded
+from stockdb import StockDB
 from credentials import token
-from loggingconfig import *
+from loggingconfig import logging
 import telegram
 import time
-import sys
 import os
-import subprocess
 import json
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
 from flask import Flask, request, render_template
 
 bot = telegram.Bot(token=token)
@@ -34,6 +32,7 @@ def index():
 
 @app.route('/stock_data')
 def stockdata():
+    stockDB = StockDB()
     stock_list = [stock[0] for stock in stockDB.stockList()]
     stock_data = checkStocksThreaded(stock_list)
     updated_time = time.strftime("%H:%M:%S")

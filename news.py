@@ -1,5 +1,6 @@
-from actions import *
-from loggingconfig import *
+from loggingconfig import logging
+from actions import sendMessage
+from stockdb import StockDB
 import requests
 from bs4 import BeautifulSoup
 import sqlite3
@@ -66,7 +67,7 @@ class NewsDB():
             link = item.contents[2].strip()
             date_obj = datetime.strptime(item.find('pubdate').text, "%a, %d %b %Y %H:%M:%S GMT") + timedelta(hours=8)
             date = datetime.strftime(date_obj, "%A, %d %B %Y %H:%M:%S")
-            description = item.find('description').text
+            # description = item.find('description').text
             source = item.find('source').text
             sourcelink = item.find('source')['url']
             # news_dict = {'title' : title, 'link' : link, 'date' : date, 'source' : source, 'sourcelink' : sourcelink}
@@ -134,6 +135,7 @@ newsDB = NewsDB()
 newstriggerDB = NewsTriggerDB()
 
 if __name__ == "__main__":
+    stockDB = StockDB()
     stock_list = [stock[0] for stock in stockDB.stockList()]
     news_dict = newsDB.getNewNews(stock_list)
     for stock_id,news in news_dict.items():

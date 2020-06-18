@@ -83,7 +83,3 @@ class PredictionRecordDB():
         """ Getting previous alert records """
         records = self.conn.execute("""SELECT * FROM predictions""").fetchall()
         return records
-
-stockDB = StockDB()
-msgrecordDB = MsgRecordDB()
-predictionrecordDB = PredictionRecordDB()

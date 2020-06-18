@@ -1,7 +1,8 @@
 from selenium import webdriver
 import pandas as pd
-from actions import *
-from loggingconfig import *
+from actions import sendMessage
+from stockdb import StockDB, PredictionRecordDB
+from loggingconfig import logging
 
 def getPredictions():
     options = webdriver.ChromeOptions()
@@ -15,6 +16,8 @@ def getPredictions():
     return df
 
 def predictionsCheck():
+    stockDB = StockDB()
+    predictionrecordDB = PredictionRecordDB()
     predictions  = getPredictions()
     stocks = [stock[0].upper() for stock in stockDB.stockList()]
     for result in predictions.values:

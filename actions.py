@@ -1,13 +1,14 @@
-from stockdb import stockDB,msgrecordDB,predictionrecordDB
+from stockdb import StockDB,MsgRecordDB,PredictionRecordDB
 from predictions import predictionsCheck
-from news import newsDB,newstriggerDB
+from news import NewsDB,NewsTriggerDB
 from credentials import token
-from loggingconfig import *
+from loggingconfig import logging
 from yahoo_fin import stock_info as si
 from multiprocessing.pool import ThreadPool
 import telegram
 import logging
 import time
+import sys
 
 bot = telegram.Bot(token=token)
 
@@ -29,13 +30,14 @@ def checkStocksThreaded(stock_ids : list) -> dict:
 
 def QuarterlyCheck(stock_datas=None):
     """ 15 minute check during trading hours to make sure stock price has not hit target """
+    stockDB = StockDB()
+    msgrecordDB = MsgRecordDB()
     stocklist = stockDB.stockList()
     stock_ids = [stock_id for stock_id,_,_ in stocklist]
     if not stock_datas:
         stock_datas = checkStocksThreaded(stock_ids)
     for stock_id,stock_trigger,trigger_type in stocklist:
         stock_data = stock_datas[stock_id]
-        quote_price,percentage,volume,day_range = stock_data
         last_time = msgrecordDB.getMsgRecord(stock_id,trigger_type)
         if last_time: date = last_time[2]
         message = None
@@ -43,12 +45,12 @@ def QuarterlyCheck(stock_datas=None):
             if trigger_type == 'sell' and stock_data[0] <= float(stock_trigger):
                 message = f"{stock_id} has gone below your trigger amount of ${stock_trigger} after going above at {date}.\nCurrent Price: ${stock_data[0]}\nPercentage = {'' if stock_data[1] < 0 else '+'}{stock_data[1]}%"
             if trigger_type == 'buy' and stock_data[0] >= float(stock_trigger):
-                message = message = f"{stock_id} has gone above your trigger amount of ${stock_trigger} after going below at {date}.\nCurrent Price: ${stock_data[0]}\nPercentage = {'' if stock_data[1] < 0 else '+'}{stock_data[1]}%"
+                message = f"{stock_id} has gone above your trigger amount of ${stock_trigger} after going below at {date}.\nCurrent Price: ${stock_data[0]}\nPercentage = {'' if stock_data[1] < 0 else '+'}{stock_data[1]}%"
         else:
             if trigger_type == 'sell' and stock_data[0] >= float(stock_trigger):
                 message = f"{stock_id} has gone above your trigger amount of ${stock_trigger}.\nCurrent Price: ${stock_data[0]}\nPercentage = {'' if stock_data[1] < 0 else '+'}{stock_data[1]}%"
             if trigger_type == 'buy' and stock_data[0] <= float(stock_trigger):
-                message = message = f"{stock_id} has gone below your trigger amount of ${stock_trigger}.\nCurrent Price: ${stock_data[0]}\nPercentage = {'' if stock_data[1] < 0 else '+'}{stock_data[1]}%"
+                message = f"{stock_id} has gone below your trigger amount of ${stock_trigger}.\nCurrent Price: ${stock_data[0]}\nPercentage = {'' if stock_data[1] < 0 else '+'}{stock_data[1]}%"
         if message and last_time:
             sendMessage(message)
             msgrecordDB.removeMsgRecord(stock_id,trigger_type)
@@ -58,6 +60,7 @@ def QuarterlyCheck(stock_datas=None):
     logging.info("Performed quarterly stock price check")
 
 def tradingMode():
+    stockDB = StockDB()
     stock_ids = [stock_item[0] for stock_item in stockDB.stockList()]
     stock_data = checkStocksThreaded(stock_ids)
     QuarterlyCheck(stock_data)
@@ -82,6 +85,7 @@ def newMessage(message):
     if command == 'help':
         sendMessage("Welcome to the Stock bot!\nMade by Sachin Ramanathan")
     elif command == 'add_stock':
+        stockDB = StockDB()
         items = message.split()
         if len(items) != 4 or (items[3].lower() != 'buy' and items[3].lower() != 'sell'):
             sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/add_stock AAPL 200 BUY\n\t/add_stock AAPL 200 SELL")
@@ -97,6 +101,7 @@ def newMessage(message):
                 stockDB.removeStock(items[1],trigger_type)
                 sendMessage(f"Error: {items[1]} doesn't exist and therefore not added to watchlist. Check your spelling.")
     elif command == 'remove_stock':
+        stockDB = StockDB()
         items = message.split()
         if len(items) != 3:
             sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/remove_stock AAPL BUY")
@@ -104,6 +109,7 @@ def newMessage(message):
             stockDB.removeStock(items[1],items[2])
             sendMessage(f"{items[1]} stock succesfully removed from watchlist!")
     elif command == 'change_stock':
+        stockDB = StockDB()
         items = message.split()
         if len(items) != 4:
             sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/change_stock AAPL 200 SELL")
@@ -111,6 +117,7 @@ def newMessage(message):
             stockDB.changeStock(items[1],items[2],items[3])
             sendMessage(f"{items[1]} stock succesfully changed in watchlist!")
     elif command == 'list_stock':
+        stockDB = StockDB()
         message = "Stock Watchlist:\n\nStock ID - Target Price - Buy/Sell"
         stock_list = stockDB.stockList()
         for stock in stock_list:
@@ -118,6 +125,7 @@ def newMessage(message):
             message += line
         sendMessage(message)
     elif command == 'report':
+        stockDB = StockDB()
         message = "Stocks Report:\n\nStock ID - Stock Price - Increase/Decrease %"
         stock_ids = [stock_item[0] for stock_item in stockDB.stockList()]
         stock_data = checkStocksThreaded(stock_ids)
@@ -132,6 +140,8 @@ def newMessage(message):
         predictionsCheck()
         sendMessage("Predictions check ran succesfully")
     elif command == 'news_check':
+        stockDB = StockDB()
+        newsDB = NewsDB()
         stock_list = [stock[0] for stock in stockDB.stockList()]
         news_dict = newsDB.getNewNews(stock_list)
         for stock_id,news in news_dict.items():
@@ -139,6 +149,7 @@ def newMessage(message):
                 sendMessage(newsDB.formatNews(stock_id,news_one))
         sendMessage("News check ran succesfully")
     elif command == 'add_keyword':
+        newstriggerDB = NewsTriggerDB()
         items = message.split()
         if len(items) != 3:
             sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/add_keyword breakthrough 200")
@@ -150,6 +161,7 @@ def newMessage(message):
             except:
                 sendMessage(f"Sorry, your keyword was not added, possibly because the keyword already exists, or was not an integer.")
     elif command == 'remove_keyword':
+        newstriggerDB = NewsTriggerDB()
         items = message.split()
         if len(items) != 2:
             sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/remove_keyword breakthrough")
@@ -157,6 +169,7 @@ def newMessage(message):
             newstriggerDB.removeTrigger(items[1])
             sendMessage(f"{items[1]} succesfully removed from keywords")
     elif command == 'change_keyword':
+        newstriggerDB = NewsTriggerDB()
         items = message.split()
         if len(items) != 3:
             sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/change_keyword breakthrough 200")
@@ -169,6 +182,7 @@ def newMessage(message):
             except:
                 sendMessage(f"Points should be an integer but got {items[2]} instead")
     elif command == 'list_keyword':
+        newstriggerDB = NewsTriggerDB()
         items = message.split()
         triggers = newstriggerDB.getAllTriggers()
         message = "Trigger\t-\tPoints\n"
