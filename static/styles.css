@@ -40,7 +40,6 @@ footer{
     width: 100%;
 }
 .stock_price{
-    display: inline-block;
     font-size : 90%;
     vertical-align: bottom;
     float: left; /* Necessary */
