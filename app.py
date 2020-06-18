@@ -75,7 +75,7 @@ def ngrok():
         tunnelsjson = json.loads(soup.find('p').text)
         url = tunnelsjson['tunnels'][0]['public_url'].replace('http://','https://')
     except:
-        os.system('ngrok http 4000 > /dev/null &')
+        os.system('ngrok http 5000 > /dev/null &')
         time.sleep(10)
         try:
             req = requests.get('http://127.0.0.1:4040/api/tunnels')
@@ -87,15 +87,10 @@ def ngrok():
             exit()
     return url
 
-def create_app():
-    app = Flask(__name__)
+if __name__ == '__main__':
     url = ngrok()
     logging.info(f"Ngrok url obtained - {url}")
     setWebhook(url)
     logging.info("Web app starting")
-    return app
-
-app = create_app()
-
-if __name__ == '__main__':
     app.run(threaded=True)
+    logging.warning('Web app stopped')
