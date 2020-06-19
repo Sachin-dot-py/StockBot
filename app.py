@@ -33,7 +33,7 @@ def index():
 @app.route('/stock_news')
 def stocknews():
     news = ''
-    link = 'https://news.google.com/rss' # Change
+    link = 'https://www.cnbc.com/id/100003114/device/rss/rss.html' # Change
     req = requests.get(link)
     soup = BeautifulSoup(req.text,'lxml')
     items = soup.find_all('item')

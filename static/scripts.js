@@ -9,7 +9,6 @@ function updateTable() {
         cellColor();
         document.querySelector("#loader").style.display = "none"; 
         document.querySelector("body").style.visibility = "visible"; 
-        updateNews();
       },
       error: function(xhr) {
         console.log("Error updating table. Trying again after 2 minutes...");
@@ -46,5 +45,7 @@ function updateNews() {
 function load(){
   console.log("Loading page...");
   updateTable();
+  updateNews();
   setInterval(updateTable, 120 * 1000);
+  setInterval(updateNews, 600 * 1000);
 }
