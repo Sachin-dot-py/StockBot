@@ -119,8 +119,11 @@ def newMessage(message):
         if len(items) != 4:
             sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/change_stock AAPL 200 SELL")
         else:
-            stockDB.changeStock(items[1],items[2],items[3])
-            sendMessage(f"{items[1]} stock succesfully changed in watchlist!")
+            try:
+                stockDB.changeStock(items[1],items[2],items[3])
+                sendMessage(f"{items[1]} stock succesfully changed in watchlist!")
+            except:
+                sendMessage(f"Error changing details of {items[1]} in watchlist!")
     elif command == 'list_stock':
         stockDB = StockDB()
         message = "Stock Watchlist:\n\nStock ID - Target Price - Buy/Sell"
