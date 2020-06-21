@@ -32,6 +32,7 @@ def index():
 
 @app.route('/stock_news')
 def stocknews():
+    start = time.time()
     news = ''
     link = 'https://www.cnbc.com/id/100003114/device/rss/rss.html' # Change
     req = requests.get(link)
@@ -40,10 +41,13 @@ def stocknews():
     for item in items:
         title = item.find('title').text
         news += f"{title} | "
+    end = time.time()
+    logging.info(f"Updated news in {round(end-start, 2)} seconds")
     return news
 
 @app.route('/stock_data')
 def stockdata():
+    start = time.time()
     indexes = ['^DJI', '^IXIC', '^GSPC']
     index_names = ['Dow Jones', 'Nasdaq', 'S&P 500']
     index_data = checkStocksThreaded(indexes).values()
@@ -52,7 +56,8 @@ def stockdata():
     stock_list = [stock[0] for stock in stockDB.stockList()]
     stock_data = checkStocksThreaded(stock_list)
     updated_time = time.strftime("%H:%M:%S")
-    logging.info("Updated dashboard stock data")
+    end = time.time()
+    logging.info(f"Updated dashboard data in {round(end-start, 2)} seconds")
     return render_template('stock_table.html', stock_data=stock_data, updated_time=updated_time, index_datas=index_datas)
 
 @app.route('/favicon.ico')
