@@ -17,6 +17,7 @@ logging.getLogger('werkzeug').setLevel(logging.ERROR)
 @app.route('/{}'.format(token), methods=['POST'])
 def respond():
     """ Parses telegram update """
+    return 'ok'
     update = telegram.Update.de_json(request.get_json(force=True), bot)
     chat_id = update.message.chat.id
     text = update.message.text.encode('utf-8').decode()
