@@ -119,10 +119,15 @@ class NewsDB():
 
     def getNews(self, stock_id):
         stock_name = self.getCompany(stock_id)
+        # print(f"{stock_id} ({stock_name})")
         news = self.getAllNews(stock_id)
+        # print(f"Stage 1: {len(news)}")
         news = self.removeDuplicates(stock_id, news)
+        # print(f"Stage 2: {len(news)}")
         self.addNews(stock_id, news)
         news = self.getImportant(stock_id, stock_name, news)
+        # print(f"Stage 3: {len(news)}")
+        # print("------------------")
         return news
 
     def getNewNews(self, stock_ids : list) -> dict:
