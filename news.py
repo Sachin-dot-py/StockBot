@@ -20,8 +20,8 @@ class NewsTriggerDB():
         self.conn.execute("""CREATE TABLE IF NOT EXISTS news_triggers (trigger TEXT, points REAL)""")
 
     def addTrigger(self, trigger : str, points : int):
-        points = self.getTriggerPts(trigger)
-        if points:
+        epoints = self.getTriggerPts(trigger)
+        if epoints:
             self.conn.execute("""UPDATE news_triggers SET points=? WHERE trigger=?""", (points,trigger))
         else:
             self.conn.execute("""INSERT INTO news_triggers values(?,?)""", (trigger,points))
