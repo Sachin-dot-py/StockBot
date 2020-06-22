@@ -212,6 +212,9 @@ def newMessage(message):
     elif command == 'stop_dashboard':
         subprocess.call('pkill -o chromium', shell=True)
         sendMessage("Dashboard stopping...")
+    elif command == 'reboot':
+        sendMessage("Rebooting Raspberry Pi...")
+        subprocess.call('sudo reboot now', shell=True)
     else:
         sendMessage(f"Invalid command /{command}!")
 
