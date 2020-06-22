@@ -207,7 +207,7 @@ def newMessage(message):
             line = f"Stock ID : {items[1]}\nStock Price : ${stock_info[0]}\nIncrease/Decrease % : {'' if stock_info[1] < 0 else '+'}{stock_info[1]}%\nVolume :  {stock_info[2]}\nDay's Range : {stock_info[3]}"
             sendMessage(line)
     elif command == 'start_dashboard':
-        subprocess.call('openpage http://0.0.0.0:4000', shell=True)
+        subprocess.call('DISPLAY=:0 /usr/bin/chromium-browser --noerrdialogs --disable-infobars --kiosk --app= http://0.0.0.0:4000 &', shell=True)
         sendMessage("Dashboard starting...")
     elif command == 'stop_dashboard':
         subprocess.call('pkill -o chromium', shell=True)
