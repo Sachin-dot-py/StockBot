@@ -9,6 +9,7 @@ import telegram
 import logging
 import time
 import sys
+import subprocess
 
 bot = telegram.Bot(token=token)
 
@@ -205,6 +206,12 @@ def newMessage(message):
             stock_info = checkStock(items[1])
             line = f"Stock ID : {items[1]}\nStock Price : ${stock_info[0]}\nIncrease/Decrease % : {'' if stock_info[1] < 0 else '+'}{stock_info[1]}%\nVolume :  {stock_info[2]}\nDay's Range : {stock_info[3]}"
             sendMessage(line)
+    elif command == 'start_dashboard':
+        subprocess.call('openpage http://0.0.0.0:4000', shell=True)
+        sendMessage("Dashboard starting...")
+    elif command == 'stop_dashboard':
+        subprocess.call('pkill -o chromium', shell=True)
+        sendMessage("Dashboard stopping...")
     else:
         sendMessage(f"Invalid command /{command}!")
 
