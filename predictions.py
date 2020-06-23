@@ -5,6 +5,7 @@ from loggingconfig import logging
 if __name__ != "predictions":
     from actions import sendMessage
 
+
 def getPredictions():
     options = webdriver.ChromeOptions()
     options.headless = True
@@ -13,13 +14,14 @@ def getPredictions():
     dfs = pd.read_html(driver.page_source)
     df = pd.concat(dfs).fillna('-')
     df.reset_index(inplace=True)
-    df = df.drop('index',axis=1)
+    df = df.drop('index', axis=1)
     return df
+
 
 def predictionsCheck():
     stockDB = StockDB()
     predictionrecordDB = PredictionRecordDB()
-    predictions  = getPredictions()
+    predictions = getPredictions()
     stocks = [stock[0].upper() for stock in stockDB.stockList()]
     for result in predictions.values:
         ticker = result[1]
@@ -30,6 +32,7 @@ def predictionsCheck():
                 sendMessage(message)
                 predictionrecordDB.addPredictionRecord(*result)
     logging.info("Predictions check ran succesfully")
+
 
 if __name__ == "__main__":
     predictionsCheck()

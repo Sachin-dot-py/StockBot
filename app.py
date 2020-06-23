@@ -14,6 +14,7 @@ bot = telegram.Bot(token=token)
 app = Flask(__name__)
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
+
 @app.route('/{}'.format(token), methods=['POST'])
 def respond():
     """ Parses telegram update """
@@ -21,22 +22,24 @@ def respond():
     chat_id = update.message.chat.id
     text = update.message.text.encode('utf-8').decode()
     logging.info(f"Recieved message {text}")
-    if str(chat_id) not in ['855910557','1207015683'] : return
+    if str(chat_id) not in ['855910557', '1207015683']: return
     newMessage(text)
     return 'ok'
+
 
 @app.route('/')
 def index():
     logging.info("Stock Dashboard session started")
     return render_template('index.html')
 
+
 @app.route('/stock_news')
 def stocknews():
     start = time.time()
     news = ''
-    link = 'https://www.cnbc.com/id/100003114/device/rss/rss.html' # Change
+    link = 'https://www.cnbc.com/id/100003114/device/rss/rss.html'  # Change
     req = requests.get(link)
-    soup = BeautifulSoup(req.text,'lxml')
+    soup = BeautifulSoup(req.text, 'lxml')
     items = soup.find_all('item')
     for item in items:
         title = item.find('title').text
@@ -44,6 +47,7 @@ def stocknews():
     end = time.time()
     logging.info(f"Updated news in {round(end-start, 2)} seconds")
     return news
+
 
 @app.route('/stock_data')
 def stockdata():
@@ -58,11 +62,16 @@ def stockdata():
     updated_time = time.strftime("%H:%M:%S")
     end = time.time()
     logging.info(f"Updated dashboard data in {round(end-start, 2)} seconds")
-    return render_template('stock_table.html', stock_data=stock_data, updated_time=updated_time, index_datas=index_datas)
+    return render_template('stock_table.html',
+                           stock_data=stock_data,
+                           updated_time=updated_time,
+                           index_datas=index_datas)
+
 
 @app.route('/favicon.ico')
 def favicon():
     return app.send_static_file('favicon.ico')
+
 
 def setWebhook(url):
     """ Sets telegram webhook """
@@ -72,13 +81,15 @@ def setWebhook(url):
     else:
         logging.error("Webhook setup failed.")
 
+
 def ngrok():
     """ Starts ngrok and returns url """
     try:
         req = requests.get('http://127.0.0.1:4040/api/tunnels')
         soup = BeautifulSoup(req.text, 'lxml')
         tunnelsjson = json.loads(soup.find('p').text)
-        url = tunnelsjson['tunnels'][0]['public_url'].replace('http://','https://')
+        url = tunnelsjson['tunnels'][0]['public_url'].replace(
+            'http://', 'https://')
     except:
         os.system('ngrok http 4000 > /dev/null &')
         time.sleep(10)
@@ -86,11 +97,13 @@ def ngrok():
             req = requests.get('http://127.0.0.1:4040/api/tunnels')
             soup = BeautifulSoup(req.text, 'lxml')
             tunnelsjson = json.loads(soup.find('p').text)
-            url = tunnelsjson['tunnels'][0]['public_url'].replace('http://','https://')
+            url = tunnelsjson['tunnels'][0]['public_url'].replace(
+                'http://', 'https://')
         except:
             logging.critical("Failure in obtaining ngrok url")
             exit()
     return url
+
 
 url = ngrok()
 logging.info(f"Ngrok url obtained - {url}")
@@ -98,4 +111,4 @@ setWebhook(url)
 logging.info("Web app starting")
 
 if __name__ == '__main__':
-    app.run(port=4000,threaded=True)
+    app.run(port=4000, threaded=True)
