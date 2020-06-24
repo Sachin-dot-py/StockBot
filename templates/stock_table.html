@@ -15,7 +15,7 @@
         <div class="stock-data">
         <span class="stock_id"><b>{{ indexname }}</b></span>
         <br>
-        <span class="stock_price">${{ indexdata[0] }}</span>
+        <span class="stock_price">{{ indexdata[0] }}</span>
         <span class="stock_percentage">{{ "+" if indexdata[1] >= 0}}{{ indexdata[1] }}%</span>
         </div>
     {% endfor %}
