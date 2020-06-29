@@ -55,7 +55,7 @@ def stockdata():
     indexes = ['^DJI', '^IXIC', '^GSPC']
     index_names = ['Dow Jones', 'Nasdaq', 'S&P 500']
     index_data = checkStocksThreaded(indexes).values()
-    index_datas = {index_name : [int(index_data[0],index_data[1]] for index_name, index_data in zip(index_names, index_data)}
+    index_datas = {index_name : [int(index_data[0]),index_data[1]] for index_name, index_data in zip(index_names, index_data)}
     stockDB = StockDB()
     stock_list = [stock[0] for stock in stockDB.stockList()]
     stock_data = checkStocksThreaded(stock_list)
