@@ -2,9 +2,6 @@ from selenium import webdriver
 import pandas as pd
 from stockdb import StockDB, PredictionRecordDB
 from loggingconfig import logging
-if __name__ != "predictions":
-    from actions import sendMessage
-
 
 def getPredictions():
     options = webdriver.ChromeOptions()
@@ -19,6 +16,7 @@ def getPredictions():
 
 
 def predictionsCheck():
+    from actions import sendMessage
     stockDB = StockDB()
     predictionrecordDB = PredictionRecordDB()
     predictions = getPredictions()
@@ -35,4 +33,5 @@ def predictionsCheck():
 
 
 if __name__ == "__main__":
+    from actions import sendMessage
     predictionsCheck()
