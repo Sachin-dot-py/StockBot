@@ -180,5 +180,5 @@ if __name__ == "__main__":
     news_dict = newsDB.getNewNews(stock_list)
     for stock_id, news in news_dict.items():
         for news_one in news:
-            news_bot.sendMessage(chat_id, newsDB.formatNews(stock_id, news_one))
+            news_bot.sendMessage(chat_id=chat_id, text=newsDB.formatNews(stock_id, news_one))
     logging.info("Performed news check successfully")

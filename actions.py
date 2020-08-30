@@ -3,7 +3,7 @@ from state import StateDB
 from portfolio import PortfolioDB
 from predictions import predictionsCheck
 from news import NewsDB, NewsTriggerDB
-from credentials import token, chat_id
+from credentials import token, chat_id, news_bot_token
 from loggingconfig import logging
 from yahoo_fin import stock_info as si
 from multiprocessing.pool import ThreadPool
@@ -14,6 +14,7 @@ import sys
 import subprocess
 
 bot = telegram.Bot(token=token)
+news_bot = telegram.Bot(news_bot_token)
 
 def checkStock(stock_id):
     """ Checks price of stock from Yahoo! Finance """
@@ -237,7 +238,7 @@ def newMessage(message):
         news_dict = newsDB.getNewNews(stock_list)
         for stock_id, news in news_dict.items():
             for news_one in news:
-                sendMessage(newsDB.formatNews(stock_id, news_one))
+                news_bot.sendMessage(chat_id=chat_id, text=newsDB.formatNews(stock_id, news_one))
         sendMessage("News check ran succesfully")
     elif command == 'add_keyword':
         newstriggerDB = NewsTriggerDB()
