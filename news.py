@@ -1,4 +1,6 @@
 from loggingconfig import logging
+from credentials import news_bot_token, chat_id
+import telegram
 from stockdb import StockDB
 import requests
 from bs4 import BeautifulSoup
@@ -12,6 +14,7 @@ import difflib
 if __name__ != "news":
     from actions import sendMessage
 
+news_bot = telegram.Bot(news_bot_token)
 
 class NewsTriggerDB():
     def __init__(self):
@@ -177,5 +180,5 @@ if __name__ == "__main__":
     news_dict = newsDB.getNewNews(stock_list)
     for stock_id, news in news_dict.items():
         for news_one in news:
-            sendMessage(newsDB.formatNews(stock_id, news_one))
+            news_bot.sendMessage(chat_id, newsDB.formatNews(stock_id, news_one))
     logging.info("Performed news check successfully")

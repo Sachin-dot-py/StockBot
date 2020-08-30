@@ -1,10 +1,11 @@
 from actions import newMessage, sendMessage, checkStocksThreaded
 from stockdb import StockDB
 from credentials import token
-from loggingconfig import logging
+from loggingconfig import logging, handle_unhandled_exception
 import telegram
 import time
 import os
+import sys
 import json
 import requests
 from bs4 import BeautifulSoup
@@ -23,7 +24,11 @@ def respond():
     text = update.message.text.encode('utf-8').decode()
     logging.info(f"Recieved message {text}")
     if str(chat_id) not in ['855910557', '1207015683']: return
-    newMessage(text)
+    try:
+        newMessage(text)
+    except Exception as e:
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        handle_unhandled_exception(exc_type, exc_value, exc_tb)
     return 'ok'
 
 

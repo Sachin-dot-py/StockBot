@@ -1,4 +1,6 @@
 from stockdb import StockDB, MsgRecordDB, PredictionRecordDB
+from state import StateDB
+from portfolio import PortfolioDB
 from predictions import predictionsCheck
 from news import NewsDB, NewsTriggerDB
 from credentials import token, chat_id
@@ -12,7 +14,6 @@ import sys
 import subprocess
 
 bot = telegram.Bot(token=token)
-
 
 def checkStock(stock_id):
     """ Checks price of stock from Yahoo! Finance """
@@ -88,14 +89,74 @@ def sendMessage(message, chatid=None):  # 1207015683, 855910557
     """ Send message via telegram to user """
     bot.sendMessage(chat_id=chatid, text=message)
 
+def add_portfolio(message):
+    stateDB = StateDB()
+    pfDB = PortfolioDB()
+    if message.lower() == "c":
+        stateDB.deleteState()
+        sendMessage("Process cancelled succesfully")
+        return
+    stage = len(stateDB.getVars())
+    if stage == 1:
+        stateDB.addVar(message)
+        sendMessage("How many stocks have you bought/sold? eg. 31 (type C to cancel)")
+    if stage == 2:
+        try:
+            number = int(message)
+        except:
+            sendMessage("That's not a valid number! Try again.")
+        else:
+            stateDB.addVar(number)
+            sendMessage("How much did you buy/sell it for? eg. 20.67 (type C to cancel)")
+    if stage == 3:
+        try:
+            price = float(message.strip("$"))
+        except:
+            sendMessage("That's not a valid price! Try again.")
+        else:
+            stateDB.addVar(price)
+            sendMessage("How much was the commission price? eg. 7.50 (type C to cancel)")
+    if stage == 4:
+        try:
+            price = float(message.strip("$"))
+        except:
+            sendMessage("That's not a valid price! Try again.")
+        else:
+            stateDB.addVar(price)
+            sendMessage("When did you buy/sell it? eg. 02/04/2020 (type C to cancel)")
+    if stage == 5:
+        try:
+            day, month, year = [int(x) for x in message.split("/")]
+            
+        except:
+            sendMessage("That's not a valid year! Try again.")
+        else:
+            stateDB.addVar(f"{day}/{month}/{year}")
+            sendMessage("Are you buying or selling stock? Reply with 'buy' or 'sell'.")
+    if stage == 6:
+        if message.lower() not in ['buy', 'sell']:
+            sendMessage("That's not a valid option! Try again.")
+        else:
+            stateDB.addVar(message)
+            data = stateDB.getVars()
+            pfDB.addStock(*data[1:])
+            sendMessage(f"Ticker: {data[1]}\nQuantity: {data[2]}\nUnit Price: ${data[3]}\nCommission Price: ${data[4]}\nDate: {data[5]}\nType: {data[6]}\nAdded succesfully to portfolio")
+            stateDB.deleteState()
+
 
 def newMessage(message):
     """ Parse a new message received from Telegram """
     if message[0] == '/':
         command = message.split()[0].strip('/')
     else:
-        sendMessage(
-            f"'{message}' is not a valid command.\nType /help for more info")
+        stateDB = StateDB()
+        state = stateDB.getState()
+        if state: 
+            if state == "add_portfolio":
+                add_portfolio(message)
+        else:
+            sendMessage(
+                f"'{message}' is not a valid command.\nType /help for more info")
         return
     if command == 'help':
         sendMessage("Welcome to the Stock bot!\nMade by Sachin Ramanathan")
@@ -249,6 +310,14 @@ def newMessage(message):
     elif command == 'stop_dashboard':
         subprocess.call('pkill -o chromium', shell=True)
         sendMessage("Dashboard stopping...")
+    elif command == "dashboard_link":
+        ips = subprocess.check_output("hostname -I", shell=True).decode("utf-8").split()
+        ip = ips[1]
+        sendMessage(f"Link to your dashboard:\n{ip}:4000")
+    elif command == "add_portfolio":
+        stateDB = StateDB()
+        stateDB.setState("add_portfolio")
+        sendMessage("What is the ticker name of the stock? eg. AAPL (type C to cancel)")
     elif command == 'reboot':
         sendMessage("Rebooting Raspberry Pi...")
         subprocess.call('sudo reboot now', shell=True)
