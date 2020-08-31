@@ -3,7 +3,7 @@ from state import StateDB
 from portfolio import PortfolioDB
 from predictions import predictionsCheck
 from news import NewsDB, NewsTriggerDB
-from credentials import token, chat_id, news_bot_token
+from credentials import token, chat_id, news_bot_token, FINNHUB_API_KEY
 from loggingconfig import logging
 from yahoo_fin import stock_info as si
 from multiprocessing.pool import ThreadPool
@@ -12,11 +12,21 @@ import logging
 import time
 import sys
 import subprocess
+import finnhub
 
 bot = telegram.Bot(token=token)
 news_bot = telegram.Bot(news_bot_token)
+client = finnhub.Client(api_key=FINNHUB_API_KEY)
 
 def checkStock(stock_id):
+    """ Checks price of stock from Finnhub """
+    stock = client.quote(stock_id)
+    quote_price = round(stock['c'], 2)
+    close_price = stock['pc']
+    percentage = round(((quote_price - close_price) / close_price) * 100, 2)
+    return (quote_price, percentage, 0, "") # 0, 0 for backward compatibility
+
+def _checkStock(stock_id):
     """ Checks price of stock from Yahoo! Finance """
     try:
         stock = si.get_quote_table(stock_id, dict_result=True)
@@ -29,13 +39,22 @@ def checkStock(stock_id):
     volume = int(stock['Volume'])
     return (quote_price, percentage, volume, day_range)
 
-
 def checkStocksThreaded(stock_ids: list) -> dict:
+    stock_ids = list(dict.fromkeys(stock_ids))
+    results = dict()
+    for stock_id in stock_ids:
+        try:
+            result = checkStock(stock_id)
+        except:
+            result = _checkStock(stock_id)
+        results[stock_id] = result
+    return results    
+
+def _checkStocksThreaded(stock_ids: list) -> dict:
     stock_ids = list(dict.fromkeys(stock_ids))
     with ThreadPool(64) as pool:
         results = pool.map(checkStock, stock_ids)
     return dict(zip(stock_ids, results))
-
 
 def QuarterlyCheck(stock_datas=None):
     """ 15 minute check during trading hours to make sure stock price has not hit target """
