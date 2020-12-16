@@ -346,9 +346,9 @@ def newMessage(message):
         portfolio = portfolioDB.getPortfolio()
         overall = portfolioDB.OverallPortfolio()
         message = f"Investment Amount: ${overall['investment']}\nCurrent Amount: ${overall['current']}\nPercentage: {'+' if overall['percentage'] > 0 else ''}{overall['percentage']}%\n\n"   
-        message += "Stock ID - Quantity - Investment - Current - Percentage\n"
+        message += "Ticker - Quantity - Investment - Current - Per(%)\n"
         for stock_id, details in portfolio.items():
-            message += f"{stock_id} - {details['quantity']} - ${details['value']} - ${details['current']} - {'+' if details['percentage'] > 0 else ''}{details['percentage']}\n"
+            message += f"{stock_id} : {details['quantity']} - ${details['value']} - ${details['current']} : {'+' if details['percentage'] > 0 else ''}{details['percentage']}%\n"
         sendMessage(message)
     elif command == 'reboot':
         sendMessage("Rebooting Raspberry Pi...")

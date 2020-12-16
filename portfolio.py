@@ -101,7 +101,7 @@ class PortfolioDB():
             current_val += stock['current']
 
         percentage = ((current_val-investment_val)/investment_val)*100      
-        overall = {'investment' : investment_val, 'current' : current_val, 'percentage': round(percentage, 2)}
+        overall = {'investment' : round(investment_val, 2), 'current' : round(current_val, 2), 'percentage': round(percentage, 2)}
         return overall
 
     def addStock(self, stock_id, quantity , unit_price, commission_price, date, trans_type):
