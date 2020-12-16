@@ -345,7 +345,7 @@ def newMessage(message):
         portfolioDB = PortfolioDB()
         portfolio = portfolioDB.getPortfolio()
         overall = portfolioDB.OverallPortfolio()
-        message = f"Investment Amount: ${overall['investment']}\nCurrent Amount: ${overall['current']}\nPercentage: {'+' if overall['percentage'] > 0 else ''}{overall['percentage']}%\n\n"   
+        message = f"Investment Amount: S${overall['investment']}\nCurrent Amount: S${overall['current']}\nPercentage: {'+' if overall['percentage'] > 0 else ''}{overall['percentage']}%\n\n"   
         message += "Ticker - Quantity - Investment - Current - Per(%)\n"
         for stock_id, details in portfolio.items():
             message += f"{stock_id} : {details['quantity']} - ${details['value']} - ${details['current']} : {'+' if details['percentage'] > 0 else ''}{details['percentage']}%\n"

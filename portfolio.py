@@ -1,4 +1,11 @@
 import sqlite3
+import requests
+
+def conversionRate(source : str="USD", target : str="SGD"):
+    """ Get the conversion rate from one currency to another currency """
+    resp = requests.get(f"https://api.exchangeratesapi.io/latest?symbols={target}&base={source}").json()
+    rate = resp.get('rates')[target]
+    return rate
 
 class PortfolioDB():
     """ All operations to do with buying, selling stocks from the portfolio"""
@@ -100,8 +107,11 @@ class PortfolioDB():
             investment_val += stock['value']
             current_val += stock['current']
 
-        percentage = ((current_val-investment_val)/investment_val)*100      
-        overall = {'investment' : round(investment_val, 2), 'current' : round(current_val, 2), 'percentage': round(percentage, 2)}
+        percentage = ((current_val-investment_val)/investment_val)*100  
+
+        rate = conversionRate()   
+
+        overall = {'investment' : round(investment_val * rate, 2), 'current' : round(current_val * rate, 2), 'percentage': round(percentage, 2)}
         return overall
 
     def addStock(self, stock_id, quantity , unit_price, commission_price, date, trans_type):
