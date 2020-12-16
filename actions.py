@@ -87,6 +87,9 @@ def QuarterlyCheck(stock_datas=None):
         if message and not last_time:
             sendMessage(message)
             msgrecordDB.addMsgRecord(stock_id, trigger_type)
+    # stock_datas_n = {stock_id: details[0] for stock_id, details in stock_datas.items()}
+    # pfdb = PortfolioDB()
+    # pf = pfdb.getPortfolio(stock_datas_n)
     logging.info("Performed quarterly stock price check")
 
 
@@ -157,7 +160,7 @@ def add_portfolio(message):
         if message.lower() not in ['buy', 'sell']:
             sendMessage("That's not a valid option! Try again.")
         else:
-            stateDB.addVar(message)
+            stateDB.addVar(message.lower())
             data = stateDB.getVars()
             pfDB.addStock(*data[1:])
             sendMessage(f"Ticker: {data[1]}\nQuantity: {data[2]}\nUnit Price: ${data[3]}\nCommission Price: ${data[4]}\nDate: {data[5]}\nType: {data[6]}\nAdded succesfully to portfolio")
@@ -338,6 +341,15 @@ def newMessage(message):
         stateDB = StateDB()
         stateDB.setState("add_portfolio")
         sendMessage("What is the ticker name of the stock? eg. AAPL (type C to cancel)")
+    elif command == "view_portfolio":
+        portfolioDB = PortfolioDB()
+        portfolio = portfolioDB.getPortfolio()
+        overall = portfolioDB.OverallPortfolio()
+        message = f"Investment Amount: ${overall['investment']}\nCurrent Amount: ${overall['current']}\nPercentage: {'+' if overall['percentage'] > 0 else ''}{overall['percentage']}%\n\n"   
+        message += "Stock ID - Quantity - Investment - Current - Percentage\n"
+        for stock_id, details in portfolio.items():
+            message += f"{stock_id} - {details['quantity']} - ${details['value']} - ${details['current']} - {'+' if details['percentage'] > 0 else ''}{details['percentage']}\n"
+        sendMessage(message)
     elif command == 'reboot':
         sendMessage("Rebooting Raspberry Pi...")
         subprocess.call('sudo reboot now', shell=True)

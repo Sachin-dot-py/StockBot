@@ -5,12 +5,13 @@ from stockdb import StockDB
 import requests
 from bs4 import BeautifulSoup
 import sqlite3
-import re
 from datetime import datetime, timedelta
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-import difflib
+import json
+# import difflib
+# import re
 if __name__ != "news":
     from actions import sendMessage
 
@@ -56,8 +57,9 @@ class NewsDB():
     def __init__(self):
         self.conn = sqlite3.connect('news.db', check_same_thread=False)
         self.cur = self.conn.cursor()
-        r = requests.get('https://api.iextrading.com/1.0/ref-data/symbols')
-        self.stock_symbols = r.json()
+        with open('symbols.json') as f:
+            symbols = json.load(f)
+        self.stock_symbols = symbols # 8th December 2020
         self.lemmatizer = WordNetLemmatizer()
         self.stopwords = set(stopwords.words('english'))
         self.phrase_dict = {
