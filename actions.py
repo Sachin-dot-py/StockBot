@@ -13,6 +13,7 @@ import time
 import sys
 import subprocess
 import finnhub
+import requests
 
 bot = telegram.Bot(token=token)
 news_bot = telegram.Bot(news_bot_token)
@@ -55,6 +56,12 @@ def _checkStocksThreaded(stock_ids: list) -> dict:
     with ThreadPool(64) as pool:
         results = pool.map(checkStock, stock_ids)
     return dict(zip(stock_ids, results))
+
+def conversionRate(source : str="USD", target : str="SGD"):
+    """ Get the conversion rate from one currency to another currency """
+    resp = requests.get(f"https://api.exchangeratesapi.io/latest?symbols={target}&base={source}").json()
+    rate = resp.get('rates')[target]
+    return rate
 
 def QuarterlyCheck(stock_datas=None):
     """ 15 minute check during trading hours to make sure stock price has not hit target """
@@ -345,7 +352,8 @@ def newMessage(message):
         portfolioDB = PortfolioDB()
         portfolio = portfolioDB.getPortfolio()
         overall = portfolioDB.OverallPortfolio()
-        message = f"Investment Amount: S${overall['investment']}\nCurrent Amount: S${overall['current']}\nPercentage: {'+' if overall['percentage'] > 0 else ''}{overall['percentage']}%\n\n"   
+        rate = conversionRate()
+        message = f"Investment Amount (USD): ${overall['investment']}\nInvestment Amount (SGD): ${round(overall['investment'] * rate, 2)}\nCurrent Amount (USD): ${overall['current']}\nCurrent Amount (SGD): ${round(overall['current'] * rate, 2)}\nPercentage: {'+' if overall['percentage'] > 0 else ''}{overall['percentage']}%\n\n"   
         message += "Ticker - Quantity - Investment - Current - Per(%)\n"
         for stock_id, details in portfolio.items():
             message += f"{stock_id} : {details['quantity']} - ${details['value']} - ${details['current']} : {'+' if details['percentage'] > 0 else ''}{details['percentage']}%\n"
