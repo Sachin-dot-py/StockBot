@@ -121,7 +121,7 @@ def add_portfolio(message):
         return
     stage = len(stateDB.getVars())
     if stage == 1:
-        stateDB.addVar(message)
+        stateDB.addVar(message.upper())
         sendMessage("How many stocks have you bought/sold? eg. 31 (type C to cancel)")
     if stage == 2:
         try:
