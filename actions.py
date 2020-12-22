@@ -3,7 +3,7 @@ from state import StateDB
 from portfolio import PortfolioDB
 from predictions import predictionsCheck
 from news import NewsDB, NewsTriggerDB
-from credentials import token, chat_id, news_bot_token, FINNHUB_API_KEY, FINNHUB_API_KEY_2
+from credentials import token, chat_id, news_bot_token, FINNHUB_API_KEY, FINNHUB_API_KEY_2, FINNHUB_API_KEY_3
 from loggingconfig import logging
 from yahoo_fin import stock_info as si
 from multiprocessing.pool import ThreadPool
@@ -19,24 +19,37 @@ bot = telegram.Bot(token=token)
 news_bot = telegram.Bot(news_bot_token)
 client = finnhub.Client(api_key=FINNHUB_API_KEY)
 client2 = finnhub.Client(api_key=FINNHUB_API_KEY_2)
+client3 = finnhub.Client(api_key=FINNHUB_API_KEY_3)
 
 def checkStock(stock_id):
     """ Checks price of stock from Finnhub """
     try:
-        stock = client.quote(stock_id)
+        try:
+            stock = client.quote(stock_id)
+        except:
+            try:
+                stock = client2.quote(stock_id)
+            except:
+                stock = client3.quote(stock_id)
+        quote_price = round(stock['c'], 2)
+        close_price = stock['pc']
+        percentage = round(((quote_price - close_price) / close_price) * 100, 2)
+        return (quote_price, percentage, 0, "") # 0, 0 for backward compatibility
     except:
-        stock = client2.quote(stock_id)
-    quote_price = round(stock['c'], 2)
-    close_price = stock['pc']
-    percentage = round(((quote_price - close_price) / close_price) * 100, 2)
-    return (quote_price, percentage, 0, "") # 0, 0 for backward compatibility
+        return _checkStock(stock_id)
 
 def _checkStock(stock_id):
     """ Checks price of stock from Yahoo! Finance """
     try:
         stock = si.get_quote_table(stock_id, dict_result=True)
     except:
-        stock = si.get_quote_table(stock_id, dict_result=True)
+        try:
+            stock = si.get_quote_table(stock_id, dict_result=True)
+        except:
+            try:
+                stock = si.get_quote_table(stock_id, dict_result=True)
+            except:
+                stock = si.get_quote_table(stock_id, dict_result=True)
     quote_price = round(stock['Quote Price'], 2)
     close_price = stock['Previous Close']
     percentage = round(((quote_price - close_price) / close_price) * 100, 2)
@@ -44,7 +57,7 @@ def _checkStock(stock_id):
     volume = int(stock['Volume'])
     return (quote_price, percentage, volume, day_range)
 
-def checkStocksThreaded(stock_ids: list) -> dict:
+def _checkStocksThreaded(stock_ids: list) -> dict:
     stock_ids = list(dict.fromkeys(stock_ids))
     results = dict()
     for stock_id in stock_ids:
@@ -55,9 +68,9 @@ def checkStocksThreaded(stock_ids: list) -> dict:
         results[stock_id] = result
     return results    
 
-def _checkStocksThreaded(stock_ids: list) -> dict:
+def checkStocksThreaded(stock_ids: list) -> dict:
     stock_ids = list(dict.fromkeys(stock_ids))
-    with ThreadPool(64) as pool:
+    with ThreadPool(128) as pool:
         results = pool.map(checkStock, stock_ids)
     return dict(zip(stock_ids, results))
 

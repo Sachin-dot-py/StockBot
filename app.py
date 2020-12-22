@@ -14,6 +14,7 @@ from flask import Flask, request, render_template
 bot = telegram.Bot(token=token)
 app = Flask(__name__)
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
+logging.getLogger('urllib3').setLevel(logging.ERROR)
 
 
 @app.route('/{}'.format(token), methods=['POST'])
