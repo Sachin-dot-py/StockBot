@@ -54,10 +54,16 @@ class PortfolioDB():
                 latest_value = quote_price * cur_quantity
                 percentage = 0 if cur_value == 0 else ((latest_value-cur_value)/cur_value)*100
                 
-                if cur_quantity != 0: stocks[stock_id] = {'quantity' : int(cur_quantity), 'value' : round(cur_value, 2), 'wap' : wap, 'current' : round(latest_value, 2), 'percentage' : round(percentage,2)}
+                if cur_quantity != 0: 
+                    stocks[stock_id] = {'quantity' : int(cur_quantity), 'value' : round(cur_value, 2), 'wap' : wap, 'current' : round(latest_value, 2), 'percentage' : round(percentage,2)}
+                else:
+                    del stocks[stock_id]
             
             except:
-                if cur_quantity != 0: stocks[stock_id] = {'quantity' : int(cur_quantity), 'value' : cur_value, 'wap' : wap, 'current' : None, 'percentage' : None}
+                if cur_quantity != 0:
+                    stocks[stock_id] = {'quantity' : int(cur_quantity), 'value' : cur_value, 'wap' : wap, 'current' : None, 'percentage' : None}
+                else:
+                    del stocks[stock_id]
 
             """trans_value = unit_price * quantity
 
