@@ -3,7 +3,7 @@ from state import StateDB
 from portfolio import PortfolioDB
 from predictions import predictionsCheck
 from news import NewsDB, NewsTriggerDB
-from credentials import token, chat_id, news_bot_token, FINNHUB_API_KEY
+from credentials import token, chat_id, news_bot_token, FINNHUB_API_KEY, FINNHUB_API_KEY_2
 from loggingconfig import logging
 from yahoo_fin import stock_info as si
 from multiprocessing.pool import ThreadPool
@@ -18,10 +18,14 @@ import requests
 bot = telegram.Bot(token=token)
 news_bot = telegram.Bot(news_bot_token)
 client = finnhub.Client(api_key=FINNHUB_API_KEY)
+client2 = finnhub.Client(api_key=FINNHUB_API_KEY_2)
 
 def checkStock(stock_id):
     """ Checks price of stock from Finnhub """
-    stock = client.quote(stock_id)
+    try:
+        stock = client.quote(stock_id)
+    except:
+        stock = client2.quote(stock_id)
     quote_price = round(stock['c'], 2)
     close_price = stock['pc']
     percentage = round(((quote_price - close_price) / close_price) * 100, 2)
