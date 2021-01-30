@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 from flask import Flask, request, render_template
 
 try:
-    subprocess.call("pip3 install https://github.com/Sachin-dot-py/MovieBot.git --upgrade", shell=True)
+    subprocess.call("pip3 install git+https://github.com/Sachin-dot-py/MovieBot.git --upgrade", shell=True)
     import moviebot as apy
 except:
     logging.critical("Unable to import MovieBot")
