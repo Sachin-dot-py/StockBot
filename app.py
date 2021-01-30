@@ -1,6 +1,6 @@
 from actions import newMessage, sendMessage, checkStocksThreaded
 from stockdb import StockDB
-from credentials import token
+from credentials import token, mbtoken
 from loggingconfig import logging, handle_unhandled_exception
 import telegram
 import time
@@ -11,11 +11,32 @@ import requests
 from bs4 import BeautifulSoup
 from flask import Flask, request, render_template
 
+try:
+    import moviebot as apy
+except:
+    logging.critical("Unable to import MovieBot")
+
 bot = telegram.Bot(token=token)
+mbot = telegram.Bot(token=mbtoken)
 app = Flask(__name__)
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
 logging.getLogger('urllib3').setLevel(logging.ERROR)
 
+
+@app.route('/{}'.format(mbtoken), methods=['POST'])
+def moviebot_respond():
+    """ Parses telegram update """
+    update = telegram.Update.de_json(request.get_json(force=True), bot)
+    chat_id = update.message.chat.id
+    text = update.message.text.encode('utf-8').decode()
+    logging.info(f"MOVIEBOT: Recieved message {text}")
+    if str(chat_id) not in ['855910557', '1207015683']: return
+    try:
+        apy.dispatcher.process_update(update)
+    except Exception as e:
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        handle_unhandled_exception(exc_type, exc_value, exc_tb)
+    return 'ok'
 
 @app.route('/{}'.format(token), methods=['POST'])
 def respond():
@@ -87,6 +108,14 @@ def setWebhook(url):
     else:
         logging.error("Webhook setup failed.")
 
+def mbsetWebhook(url):
+    """ Sets telegram webhook """
+    s = mbot.setWebhook('{URL}/{HOOK}'.format(URL=url, HOOK=mbtoken))
+    if s:
+        logging.info("Movie Bot Webhook succesfully set up!")
+    else:
+        logging.error("Movie Bot Webhook setup failed.")
+
 
 def ngrok():
     """ Starts ngrok and returns url """
@@ -114,6 +143,7 @@ def ngrok():
 url = ngrok()
 logging.info(f"Ngrok url obtained - {url}")
 setWebhook(url)
+mbsetWebhook(url)
 logging.info("Web app starting")
 
 if __name__ == '__main__':
