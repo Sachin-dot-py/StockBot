@@ -32,6 +32,8 @@ def moviebot_respond():
     try:
         text = update.message.text.encode('utf-8').decode()
         logging.info(f"MOVIEBOT: Recieved message {text}")
+    except:
+        pass
     try:
         apy.dispatcher.process_update(update)
     except Exception as e:
