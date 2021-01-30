@@ -6,12 +6,14 @@ import telegram
 import time
 import os
 import sys
+import subprocess
 import json
 import requests
 from bs4 import BeautifulSoup
 from flask import Flask, request, render_template
 
 try:
+    subprocess.call("pip3 install https://github.com/Sachin-dot-py/MovieBot.git --upgrade", shell=True)
     import moviebot as apy
 except:
     logging.critical("Unable to import MovieBot")
@@ -27,10 +29,9 @@ logging.getLogger('urllib3').setLevel(logging.ERROR)
 def moviebot_respond():
     """ Parses telegram update """
     update = telegram.Update.de_json(request.get_json(force=True), bot)
-    chat_id = update.message.chat.id
-    text = update.message.text.encode('utf-8').decode()
-    logging.info(f"MOVIEBOT: Recieved message {text}")
-    if str(chat_id) not in ['855910557', '1207015683']: return
+    try:
+        text = update.message.text.encode('utf-8').decode()
+        logging.info(f"MOVIEBOT: Recieved message {text}")
     try:
         apy.dispatcher.process_update(update)
     except Exception as e:
