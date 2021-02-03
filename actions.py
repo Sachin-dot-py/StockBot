@@ -190,6 +190,16 @@ def add_portfolio(message):
             sendMessage(f"Ticker: {data[1]}\nQuantity: {data[2]}\nUnit Price: ${data[3]}\nCommission Price: ${data[4]}\nDate: {data[5]}\nType: {data[6]}\nAdded succesfully to portfolio")
             stateDB.deleteState()
 
+def viewPortfolio():
+    portfolioDB = PortfolioDB()
+    portfolio = portfolioDB.getPortfolio()
+    overall = portfolioDB.OverallPortfolio(portfolio)
+    rate = conversionRate()
+    message = f"Investment Amount (USD): ${overall['investment']}\nInvestment Amount (SGD): ${round(overall['investment'] * rate, 2)}\nCurrent Amount (USD): ${overall['current']}\nCurrent Amount (SGD): ${round(overall['current'] * rate, 2)}\nPercentage: {'+' if overall['percentage'] > 0 else ''}{overall['percentage']}%\n\n"   
+    message += "Ticker - Quantity - Investment - Current - Per(%)\n"
+    for stock_id, details in portfolio.items():
+        message += f"{stock_id} : {details['quantity']} - ${details['value']} - ${details['current']} : {'+' if details['percentage'] > 0 else ''}{details['percentage']}%\n"
+    sendMessage(message)
 
 def newMessage(message):
     """ Parse a new message received from Telegram """
@@ -366,15 +376,7 @@ def newMessage(message):
         stateDB.setState("add_portfolio")
         sendMessage("What is the ticker name of the stock? eg. AAPL (type C to cancel)")
     elif command == "view_portfolio":
-        portfolioDB = PortfolioDB()
-        portfolio = portfolioDB.getPortfolio()
-        overall = portfolioDB.OverallPortfolio()
-        rate = conversionRate()
-        message = f"Investment Amount (USD): ${overall['investment']}\nInvestment Amount (SGD): ${round(overall['investment'] * rate, 2)}\nCurrent Amount (USD): ${overall['current']}\nCurrent Amount (SGD): ${round(overall['current'] * rate, 2)}\nPercentage: {'+' if overall['percentage'] > 0 else ''}{overall['percentage']}%\n\n"   
-        message += "Ticker - Quantity - Investment - Current - Per(%)\n"
-        for stock_id, details in portfolio.items():
-            message += f"{stock_id} : {details['quantity']} - ${details['value']} - ${details['current']} : {'+' if details['percentage'] > 0 else ''}{details['percentage']}%\n"
-        sendMessage(message)
+        viewPortfolio()
     elif command == 'reboot':
         sendMessage("Rebooting Raspberry Pi...")
         subprocess.call('sudo reboot now', shell=True)

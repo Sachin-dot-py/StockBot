@@ -1,18 +1,19 @@
 import sqlite3
+import os
+from credentials import cwd
 
 class PortfolioDB():
     """ All operations to do with buying, selling stocks from the portfolio"""
     def __init__(self):
+        os.chdir(cwd)
         self.conn = sqlite3.connect("portfolio.db", check_same_thread=False)
         self.cur = self.conn.cursor()
-        self.conn.execute(
-            """CREATE TABLE IF NOT EXISTS portfolio (stock_id TEXT, quantity REAL , unit_price REAL, commission_price REAL, date TEXT, trans_type TEXT)"""
-        )
+        self.conn.execute("""CREATE TABLE IF NOT EXISTS portfolio (stock_id TEXT, quantity REAL , unit_price REAL, commission_price REAL, date TEXT, trans_type TEXT)""")
     
     def getPortfolio(self, stock_datas={}): # stock_datas = {"AAPL" : 105.5, "CCL" : 3.02}
         from actions import checkStock, _checkStock, checkStocksThreaded
         stocks = {}
-        portfolios = self.listPortfolio()
+        portfolios = self.PortfolioList()
         if not stock_datas: 
             results = checkStocksThreaded([portfolio[0] for portfolio in portfolios])
             stock_datas = {stock_id: details[0] for stock_id, details in results.items()}
@@ -96,11 +97,12 @@ class PortfolioDB():
             stocks[stock_id] = {'quantity' : int(new_quantity), 'value' : new_value, 'current' : latest_value, 'percentage' : round(percentage,2)}"""
         return stocks
 
-    def OverallPortfolio(self):
+    def OverallPortfolio(self, portfolio={}):
         """ Get details of portfolio as a whole"""
         investment_val = 0
         current_val = 0
-        portfolio = self.getPortfolio() 
+
+        if portfolio=={}: portfolio = self.getPortfolio()
         
         for _, stock in portfolio.items():
             investment_val += stock['value']
@@ -118,15 +120,7 @@ class PortfolioDB():
             (stock_id, int(quantity) , unit_price, commission_price, date, trans_type))
         self.conn.commit()
 
-    def listPortfolio(self) -> list:
-        """ Lists all stocks in the database """
-        stocks = self.conn.execute("""SELECT * FROM portfolio""").fetchall()
-        return sorted(stocks)
-
-if __name__ == "__main__":
-    from actions import checkStock, _checkStock, checkStocksThreaded
-    db = PortfolioDB()
-    db.addStock("NMR", 20, 10, 10, "4/10/2020", 'buy')
-    db.addStock("NMR", 10, 15, 10, "4/10/2020", 'buy')
-    db.addStock("NMR", 10, 20, 10, "4/10/2020", 'sell')
-    print(db.getPortfolio())
+    def PortfolioList(self):
+        """ Lists the transactions in the portfolio """
+        portfolio = self.conn.execute("""SELECT * from portfolio""").fetchall()
+        return portfolio
