@@ -1,4 +1,4 @@
-from actions import newMessage, sendMessage, checkStocksThreaded
+from actions import newMessage, sendMessage, checkStocksThreaded, cwd
 from stockdb import StockDB
 from credentials import token, mbtoken
 from loggingconfig import logging, handle_unhandled_exception
@@ -23,6 +23,7 @@ mbot = telegram.Bot(token=mbtoken)
 app = Flask(__name__)
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
 logging.getLogger('urllib3').setLevel(logging.ERROR)
+os.chdir(cwd)
 
 
 @app.route('/{}'.format(mbtoken), methods=['POST'])

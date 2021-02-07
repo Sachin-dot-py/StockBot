@@ -108,7 +108,10 @@ class PortfolioDB():
             investment_val += stock['value']
             current_val += stock['current']
 
-        percentage = ((current_val-investment_val)/investment_val)*100  
+        try:
+            percentage = ((current_val-investment_val)/investment_val)*100  
+        except:
+            percentage = 0
 
         overall = {'investment' : round(investment_val, 2), 'current' : round(current_val, 2), 'percentage': round(percentage, 2)}
         return overall

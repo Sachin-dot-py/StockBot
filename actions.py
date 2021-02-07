@@ -3,7 +3,7 @@ from state import StateDB
 from portfolio import PortfolioDB
 from predictions import predictionsCheck
 from news import NewsDB, NewsTriggerDB
-from credentials import token, chat_id, news_bot_token, FINNHUB_API_KEY, FINNHUB_API_KEY_2, FINNHUB_API_KEY_3
+from credentials import token, chat_id, news_bot_token, FINNHUB_API_KEY, FINNHUB_API_KEY_2, FINNHUB_API_KEY_3, cwd
 from loggingconfig import logging
 from yahoo_fin import stock_info as si
 from multiprocessing.pool import ThreadPool
@@ -14,6 +14,7 @@ import sys
 import subprocess
 import finnhub
 import requests
+import os
 
 bot = telegram.Bot(token=token)
 news_bot = telegram.Bot(news_bot_token)
@@ -203,6 +204,7 @@ def viewPortfolio():
 
 def newMessage(message):
     """ Parse a new message received from Telegram """
+    os.chdir(cwd)
     if message[0] == '/':
         command = message.split()[0].strip('/')
     else:
@@ -215,7 +217,7 @@ def newMessage(message):
             sendMessage(
                 f"'{message}' is not a valid command.\nType /help for more info")
         return
-    if command == 'help':
+    if command == 'help' or command == 'start':
         sendMessage("Welcome to the Stock bot!\nMade by Sachin Ramanathan")
     elif command == 'add_stock':
         stockDB = StockDB()
@@ -232,7 +234,7 @@ def newMessage(message):
                 stock_info = checkStock(items[1])
                 sendMessage(
                     f"{items[1]} stock added succesfully to watchlist!")
-                line = f"Stock ID : {items[1]}\nStock Price : ${stock_info[0]}\nIncrease/Decrease % : {'' if stock_info[1] < 0 else '+'}{stock_info[1]}%\nVolume :  {stock_info[2]}\nDay's Range : {stock_info[3]}"
+                line = f"Stock ID : {items[1]}\nStock Price : ${stock_info[0]}\nIncrease/Decrease % : {'' if stock_info[1] < 0 else '+'}{stock_info[1]}%"
                 sendMessage(line)
             except:
                 stockDB.removeStock(items[1], trigger_type)
@@ -357,7 +359,7 @@ def newMessage(message):
                 "Incorrect Usage!\n\nCorrect Usage:\n\t/get_stock AAPL")
         else:
             stock_info = checkStock(items[1])
-            line = f"Stock ID : {items[1]}\nStock Price : ${stock_info[0]}\nIncrease/Decrease % : {'' if stock_info[1] < 0 else '+'}{stock_info[1]}%\nVolume :  {stock_info[2]}\nDay's Range : {stock_info[3]}"
+            line = f"Stock ID : {items[1]}\nStock Price : ${stock_info[0]}\nIncrease/Decrease % : {'' if stock_info[1] < 0 else '+'}{stock_info[1]}%"
             sendMessage(line)
     elif command == 'start_dashboard':
         subprocess.call(
