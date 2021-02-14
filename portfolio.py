@@ -127,9 +127,9 @@ class PortfolioDB():
             (stock_id, int(quantity) , unit_price, commission_price, date, trans_type))
 
         if trans_type.lower() == "sell":
-            self.addUninvested((int(quantity) * unit_price) + commission_price)
+            self.addUninvested(int((int(quantity) * unit_price) + commission_price))
         elif trans_type.lower() == "buy":
-            self.subtractUninvested((int(quantity) * unit_price) + commission_price)
+            self.subtractUninvested(int((int(quantity) * unit_price) + commission_price))
         self.conn.commit()
 
     def PortfolioList(self):
@@ -141,10 +141,10 @@ class PortfolioDB():
         """ Add uninvested money to database """
         record = self.conn.execute("""SELECT amount FROM uninvested""").fetchone()
         if record:
-            amount = record[0] + amount_add
+            amount = float(record[0]) + float(amount_add)
             self.conn.execute("""UPDATE uninvested SET amount=?""", (amount,))
         else:
-            amount = amount_add
+            amount = float(amount_add)
             self.conn.execute("""INSERT INTO uninvested VALUES (?)""", (amount,))
         self.conn.commit()
         return amount
@@ -153,7 +153,7 @@ class PortfolioDB():
         """ Get uninvested money in database """
         record = self.conn.execute("""SELECT amount FROM uninvested""").fetchone()
         if record:
-            return record[0]
+            return float(record[0])
         else:
             return 0
 
@@ -161,9 +161,9 @@ class PortfolioDB():
         """ Subtract uninvested money from database """
         record = self.conn.execute("""SELECT amount FROM uninvested""").fetchone()
         if record:
-            amount = record[0] - amount_sub
+            amount = float(record[0]) - float(amount_sub)
             self.conn.execute("""UPDATE uninvested SET amount=?""", (amount,))
         else:
-            amount = -amount_sub
+            amount = float(-amount_sub)
         self.conn.commit()
         return amount
