@@ -196,7 +196,7 @@ def viewPortfolio():
     portfolio = portfolioDB.getPortfolio()
     overall = portfolioDB.OverallPortfolio(portfolio)
     rate = conversionRate()
-    message = f"Uninvested Amount (USD): ${overall['uninvested']}\Uninvested Amount (SGD): ${round(overall['uninvested'] * rate, 2)}\nInvestment Amount (USD): ${overall['investment']}\nInvestment Amount (SGD): ${round(overall['investment'] * rate, 2)}\nCurrent Amount (USD): ${overall['current']}\nCurrent Amount (SGD): ${round(overall['current'] * rate, 2)}\nPercentage: {'+' if overall['percentage'] > 0 else ''}{overall['percentage']}%\n\n"   
+    message = f"Uninvested Amount (USD): ${overall['uninvested']}\nUninvested Amount (SGD): ${round(overall['uninvested'] * rate, 2)}\nInvestment Amount (USD): ${overall['investment']}\nInvestment Amount (SGD): ${round(overall['investment'] * rate, 2)}\nCurrent Amount (USD): ${overall['current']}\nCurrent Amount (SGD): ${round(overall['current'] * rate, 2)}\nPercentage: {'+' if overall['percentage'] > 0 else ''}{overall['percentage']}%\n\n"   
     message += "Ticker - Quantity - Investment - Current - Per(%)\n"
     for stock_id, details in portfolio.items():
         message += f"{stock_id} : {details['quantity']} - ${details['value']} - ${details['current']} : {'+' if details['percentage'] > 0 else ''}{details['percentage']}%\n"
