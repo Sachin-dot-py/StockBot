@@ -117,7 +117,7 @@ class PortfolioDB():
         except:
             percentage = 0
 
-        overall = {'investment' : round(investment_val, 2), 'current' : round(current_val, 2), 'percentage': round(percentage, 2), 'uninvested' : round(uninvested, 2)}
+        overall = {'investment' : round(investment_val, 2), 'current' : round(current_val+uninvested, 2), 'percentage': round(percentage, 2), 'uninvested' : round(uninvested, 2)}
         return overall
 
     def addStock(self, stock_id, quantity , unit_price, commission_price, date, trans_type):
