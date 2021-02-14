@@ -386,6 +386,7 @@ def newMessage(message):
         else:
             pfdb = PortfolioDB()
             pfdb.addUninvested(items[1])
+            sendMessage("Successfully completed")
     elif command == "subtract_uninvested":
         items = message.split()
         if len(items) != 2:
@@ -393,6 +394,7 @@ def newMessage(message):
         else:
             pfdb = PortfolioDB()
             pfdb.subtractUninvested(items[1])
+            sendMessage("Successfully completed")
     elif command == 'reboot':
         sendMessage("Rebooting Raspberry Pi...")
         subprocess.call('sudo reboot now', shell=True)
