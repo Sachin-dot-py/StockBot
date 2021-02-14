@@ -379,6 +379,20 @@ def newMessage(message):
         sendMessage("What is the ticker name of the stock? eg. AAPL (type C to cancel)")
     elif command == "view_portfolio":
         viewPortfolio()
+    elif command == "add_uninvested":
+        items = message.split()
+        if len(items) != 2:
+            sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/add_uninvested 2000")
+        else:
+            pfdb = PortfolioDB()
+            pfdb.addUninvested(items[1])
+    elif command == "subtract_uninvested":
+        items = message.split()
+        if len(items) != 2:
+            sendMessage("Incorrect Usage!\n\nCorrect Usage:\n\t/subtract_uninvested 2000")
+        else:
+            pfdb = PortfolioDB()
+            pfdb.subtractUninvested(items[1])
     elif command == 'reboot':
         sendMessage("Rebooting Raspberry Pi...")
         subprocess.call('sudo reboot now', shell=True)
