@@ -102,7 +102,7 @@ class PortfolioDB():
 
     def OverallPortfolio(self, portfolio={}):
         """ Get details of portfolio as a whole"""
-        uninvested = self.getUninvested()
+        uninvested = float(self.getUninvested())
         investment_val = 0
         current_val = 0
 
