@@ -15,6 +15,7 @@ import subprocess
 import finnhub
 import requests
 import os
+import datetime
 
 bot = telegram.Bot(token=token)
 news_bot = telegram.Bot(news_bot_token)
@@ -207,6 +208,18 @@ def newMessage(message):
     os.chdir(cwd)
     if message[0] == '/':
         command = message.split()[0].strip('/')
+    elif message[:3] == "FSM":
+        items = message.split()
+
+        trans_type = items[2].lower()
+        stock_id = items[3].split(":")[1]
+        quantity = int(items[4])
+        unit_price = float(items[7])
+        date = datetime.datetime.strptime(items[10].lstrip("(")[:8], "%Y%m%d")
+
+        pdfb = PortfolioDB()
+        pdfb.addStock(stock_id, quantity, unit_price, 9.99, date.strftime("%d/%m/%Y"), trans_type)
+        sendMessage(f"Ticker: {stock_id}\nQuantity: {quantity}\nUnit Price: ${unit_price}\nCommission Price: $9.99\nDate: {date.strftime('%d/%m/%Y')}\nType: {trans_type}\nAdded succesfully to portfolio")
     else:
         stateDB = StateDB()
         state = stateDB.getState()
