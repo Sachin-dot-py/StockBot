@@ -127,9 +127,9 @@ class PortfolioDB():
             (stock_id, int(quantity) , unit_price, commission_price, date, trans_type))
 
         if trans_type.lower() == "sell":
-            self.addUninvested((quantity * unit_price) + commission_price)
+            self.addUninvested((int(quantity) * unit_price) + commission_price)
         elif trans_type.lower() == "buy":
-            self.subtractUninvested((quantity * unit_price) + commission_price)
+            self.subtractUninvested((int(quantity) * unit_price) + commission_price)
         self.conn.commit()
 
     def PortfolioList(self):
