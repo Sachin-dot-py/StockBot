@@ -9,6 +9,9 @@ class PortfolioDB():
         self.conn = sqlite3.connect("portfolio.db", check_same_thread=False)
         self.cur = self.conn.cursor()
         self.conn.execute("""CREATE TABLE IF NOT EXISTS portfolio (stock_id TEXT, quantity REAL , unit_price REAL, commission_price REAL, date TEXT, trans_type TEXT)""")
+        self.conn.execute(
+            """CREATE TABLE IF NOT EXISTS uninvested (amount REAL)"""
+        )
     
     def getPortfolio(self, stock_datas={}): # stock_datas = {"AAPL" : 105.5, "CCL" : 3.02}
         from actions import checkStock, _checkStock, checkStocksThreaded
@@ -99,6 +102,7 @@ class PortfolioDB():
 
     def OverallPortfolio(self, portfolio={}):
         """ Get details of portfolio as a whole"""
+        uninvested = self.getUninvested()
         investment_val = 0
         current_val = 0
 
@@ -113,7 +117,7 @@ class PortfolioDB():
         except:
             percentage = 0
 
-        overall = {'investment' : round(investment_val, 2), 'current' : round(current_val, 2), 'percentage': round(percentage, 2)}
+        overall = {'investment' : round(investment_val, 2), 'current' : round(current_val, 2), 'percentage': round(percentage, 2), 'uninvested' : round(uninvested, 2)}
         return overall
 
     def addStock(self, stock_id, quantity , unit_price, commission_price, date, trans_type):
@@ -121,9 +125,45 @@ class PortfolioDB():
         self.conn.execute(
             """INSERT INTO portfolio (stock_id, quantity , unit_price, commission_price, date, trans_type) values (?,?,?,?,?,?) """,
             (stock_id, int(quantity) , unit_price, commission_price, date, trans_type))
+
+        if trans_type.lower() == "sell":
+            self.addUninvested((quantity * unit_price) + commission_price)
+        elif trans_type.lower() == "buy":
+            self.subtractUninvested((quantity * unit_price) + commission_price)
         self.conn.commit()
 
     def PortfolioList(self):
         """ Lists the transactions in the portfolio """
         portfolio = self.conn.execute("""SELECT * from portfolio""").fetchall()
         return portfolio
+
+    def addUninvested(self, amount_add: float):
+        """ Add uninvested money to database """
+        record = self.conn.execute("""SELECT amount FROM uninvested""").fetchone()
+        if record:
+            amount = record[0] + amount_add
+            self.conn.execute("""UPDATE uninvested SET amount=?""", (amount,))
+        else:
+            amount = amount_add
+            self.conn.execute("""INSERT INTO uninvested VALUES (?)""", (amount,))
+        self.conn.commit()
+        return amount
+
+    def getUninvested(self) -> float:
+        """ Get uninvested money in database """
+        record = self.conn.execute("""SELECT amount FROM uninvested""").fetchone()
+        if record:
+            return record[0]
+        else:
+            return 0
+
+    def subtractUninvested(self, amount_sub : float) -> float:
+        """ Subtract uninvested money from database """
+        record = self.conn.execute("""SELECT amount FROM uninvested""").fetchone()
+        if record:
+            amount = record[0] - amount_sub
+            self.conn.execute("""UPDATE uninvested SET amount=?""", (amount,))
+        else:
+            amount = -amount_sub
+        self.conn.commit()
+        return amount
