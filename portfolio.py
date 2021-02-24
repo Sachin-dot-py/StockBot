@@ -18,7 +18,7 @@ class PortfolioDB():
         stocks = {}
         portfolios = self.PortfolioList()
         if not stock_datas: 
-            results = checkStocksThreaded([portfolio[0] for portfolio in portfolios])
+            results = checkStocksThreaded(list(set([portfolio[0] for portfolio in portfolios])))
             stock_datas = {stock_id: details[0] for stock_id, details in results.items()}
         for portfolio in portfolios:
             stock_id, quantity, unit_price, commission_price, date, trans_type = portfolio

@@ -72,7 +72,7 @@ def _checkStocksThreaded(stock_ids: list) -> dict:
 
 def checkStocksThreaded(stock_ids: list) -> dict:
     stock_ids = list(dict.fromkeys(stock_ids))
-    with ThreadPool(128) as pool:
+    with ThreadPool(60) as pool:
         results = pool.map(checkStock, stock_ids)
     return dict(zip(stock_ids, results))
 
@@ -217,9 +217,16 @@ def newMessage(message):
         unit_price = float(items[7])
         date = datetime.datetime.strptime(items[10].lstrip("(")[:8], "%Y%m%d")
 
-        pdfb = PortfolioDB()
-        pdfb.addStock(stock_id, quantity, unit_price, 9.99, date.strftime("%d/%m/%Y"), trans_type)
-        sendMessage(f"Ticker: {stock_id}\nQuantity: {quantity}\nUnit Price: ${unit_price}\nCommission Price: $9.99\nDate: {date.strftime('%d/%m/%Y')}\nType: {trans_type}\nAdded succesfully to portfolio")
+        try:
+            stock_info = checkStock(stock_id)
+            pdfb = PortfolioDB()
+            pdfb.addStock(stock_id, quantity, unit_price, 9.99, date.strftime("%d/%m/%Y"), trans_type)
+            sendMessage(f"Ticker: {stock_id}\nQuantity: {quantity}\nUnit Price: ${unit_price}\nCommission Price: $9.99\nDate: {date.strftime('%d/%m/%Y')}\nType: {trans_type}\nAdded succesfully to portfolio")
+        except:
+            sendMessage(
+                f"Error: {items[1]} doesn't exist and therefore not added to portfolio."
+            )
+        return
     else:
         stateDB = StateDB()
         state = stateDB.getState()
