@@ -43,21 +43,24 @@ def checkStock(stock_id):
 def _checkStock(stock_id):
     """ Checks price of stock from Yahoo! Finance """
     try:
-        stock = si.get_quote_table(stock_id, dict_result=True)
-    except:
         try:
             stock = si.get_quote_table(stock_id, dict_result=True)
         except:
             try:
                 stock = si.get_quote_table(stock_id, dict_result=True)
             except:
-                stock = si.get_quote_table(stock_id, dict_result=True)
-    quote_price = round(stock['Quote Price'], 2)
-    close_price = stock['Previous Close']
-    percentage = round(((quote_price - close_price) / close_price) * 100, 2)
-    day_range = stock["Day's Range"]
-    volume = int(stock['Volume'])
-    return (quote_price, percentage, volume, day_range)
+                try:
+                    stock = si.get_quote_table(stock_id, dict_result=True)
+                except:
+                    stock = si.get_quote_table(stock_id, dict_result=True)
+        quote_price = round(stock['Quote Price'], 2)
+        close_price = stock['Previous Close']
+        percentage = round(((quote_price - close_price) / close_price) * 100, 2)
+        day_range = stock["Day's Range"]
+        volume = int(stock['Volume'])
+        return (quote_price, percentage, volume, day_range)
+    except:
+        return (0,0,0,"")
 
 def _checkStocksThreaded(stock_ids: list) -> dict:
     stock_ids = list(dict.fromkeys(stock_ids))
@@ -399,6 +402,13 @@ def newMessage(message):
         sendMessage("What is the ticker name of the stock? eg. AAPL (type C to cancel)")
     elif command == "view_portfolio":
         viewPortfolio()
+    elif command == "change_ticker_portfolio":
+        items = message.split()
+        if len(items) != 3 :
+            sendMessage("Incorrect Usage!\n\nCorrect Usage for changing AAPL to AAL:\n\t/change_ticker_portfolio AAPL AAL")
+        else:
+            pfdb = PortfolioDB()
+            pfdb.changeTicker(items[1], items[2])
     elif command == "add_uninvested":
         items = message.split()
         if len(items) != 2:

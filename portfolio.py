@@ -167,3 +167,8 @@ class PortfolioDB():
             amount = float(-amount_sub)
         self.conn.commit()
         return amount
+
+    def changeTicker(self, old_stock_id : str, new_stock_id):
+        """ Change ticker name of a stock in case of ticker change """
+        self.conn.execute("UPDATE portfolio SET stock_id='?' WHERE stock_id='?'", (new_stock_id, old_stock_id))
+        self.conn.commit()
