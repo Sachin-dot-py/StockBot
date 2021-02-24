@@ -152,3 +152,5 @@ logging.info("Web app starting")
 
 if __name__ == '__main__':
     app.run(port=4000, threaded=True)
+    bot.sendMessage("Stock Bot has restarted")
+    
