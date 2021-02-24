@@ -113,7 +113,7 @@ class PortfolioDB():
             current_val += stock['current']
 
         try:
-            percentage = ((current_val-investment_val)/investment_val)*100  
+            percentage = ((current_val-investment_val)/current_val)*100  
         except:
             percentage = 0
 
