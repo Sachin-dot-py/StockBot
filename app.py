@@ -149,8 +149,8 @@ logging.info(f"Ngrok url obtained - {url}")
 setWebhook(url)
 mbsetWebhook(url)
 logging.info("Web app starting")
+bot.sendMessage("Stock Bot has restarted")
 
 if __name__ == '__main__':
     app.run(port=4000, threaded=True)
-    bot.sendMessage("Stock Bot has restarted")
     
