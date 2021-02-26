@@ -17,6 +17,7 @@ import requests
 import os
 import datetime
 
+logging.getLogger('urllib3').setLevel(logging.ERROR)
 bot = telegram.Bot(token=token)
 news_bot = telegram.Bot(news_bot_token)
 client = finnhub.Client(api_key=FINNHUB_API_KEY)
