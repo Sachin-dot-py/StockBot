@@ -166,7 +166,13 @@ class NewsDB():
             news2 = self.removeDuplicates(stock_id, news2)
             self.addNews(stock_id, news2)
         # news = self.getImportant(stock_id, stock_name, news + news2) # Comment out to send all news
-        return news
+        try:
+            return news + news2
+        except:
+            if len(stock_id) <=2:
+                return news2
+            else:
+                return news
 
     def getNewNews(self, stock_ids: list) -> dict:
         news_dict = dict()
