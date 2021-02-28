@@ -1,3 +1,4 @@
+from portfolio import PortfolioDB
 from loggingconfig import logging
 from credentials import news_bot_token, chat_id
 import telegram
@@ -178,7 +179,8 @@ newstriggerDB = NewsTriggerDB()
 
 if __name__ == "__main__":
     stockDB = StockDB()
-    stock_list = [stock[0] for stock in stockDB.stockList()]
+    pfdb = PortfolioDB()
+    stock_list = list(set(pfdb.CurrentStocks() + [stock[0] for stock in stockDB.stockList()]))
     news_dict = newsDB.getNewNews(stock_list)
     for stock_id, news in news_dict.items():
         for news_one in news:

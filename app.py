@@ -1,3 +1,4 @@
+from portfolio import PortfolioDB
 from actions import newMessage, sendMessage, checkStocksThreaded, cwd
 from stockdb import StockDB
 from credentials import token, mbtoken
@@ -60,6 +61,7 @@ def respond():
 
 @app.route('/')
 def index():
+    # Cronjob turns off the dashboard everyday at 1 AM
     logging.info("Stock Dashboard session started")
     return render_template('index.html')
 
@@ -88,7 +90,8 @@ def stockdata():
     index_data = checkStocksThreaded(indexes).values()
     index_datas = {index_name : [int(index_data[0]),index_data[1]] for index_name, index_data in zip(index_names, index_data)}
     stockDB = StockDB()
-    stock_list = [stock[0] for stock in stockDB.stockList()]
+    pfdb = PortfolioDB()
+    stock_list = list(set(pfdb.CurrentStocks() + [stock[0] for stock in stockDB.stockList()]))
     stock_data = checkStocksThreaded(stock_list)
     updated_time = time.strftime("%H:%M:%S")
     end = time.time()

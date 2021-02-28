@@ -16,7 +16,7 @@ class PortfolioDB():
     def getPortfolio(self, stock_datas={}): # stock_datas = {"AAPL" : 105.5, "CCL" : 3.02}
         from actions import checkStock, _checkStock, checkStocksThreaded
         stocks = {}
-        portfolios = self.PortfolioList()
+        portfolios = [stock for stock in self.PortfolioList() if stock[0] in self.CurrentStocks()]
         if not stock_datas: 
             results = checkStocksThreaded(list(set([portfolio[0] for portfolio in portfolios])))
             stock_datas = {stock_id: details[0] for stock_id, details in results.items()}
@@ -136,6 +136,28 @@ class PortfolioDB():
         """ Lists the transactions in the portfolio """
         portfolio = self.conn.execute("""SELECT * from portfolio""").fetchall()
         return portfolio
+
+    def CurrentStocks(self):
+        stocks = {}
+        pf = self.PortfolioList()
+        for stock in pf:
+            stock_id, quantity, unit_price, commission_price, date, trans_type = stock
+
+            if stock_id in stocks:
+                cur_quantity = stocks[stock_id]
+            else:
+                cur_quantity = 0
+
+            if trans_type.lower() == "buy":
+                cur_quantity += quantity
+            elif trans_type.lower() == "sell":
+                cur_quantity -= quantity
+            else:
+                raise AssertionError(f"Transaction type is neither buy or sell: '{trans_type}'")
+
+            stocks[stock_id] = cur_quantity
+        
+        return [stock[0].upper() for stock in stocks.items() if stock[1] != 0] # Only return stocks which are currently in possession
 
     def addUninvested(self, amount_add: float):
         """ Add uninvested money to database """

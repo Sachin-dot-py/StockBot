@@ -1,3 +1,4 @@
+from portfolio import PortfolioDB
 from selenium import webdriver
 import pandas as pd
 from stockdb import StockDB, PredictionRecordDB
@@ -18,9 +19,10 @@ def getPredictions():
 def predictionsCheck():
     from actions import sendMessage
     stockDB = StockDB()
+    pfdb = PortfolioDB()
     predictionrecordDB = PredictionRecordDB()
     predictions = getPredictions()
-    stocks = [stock[0].upper() for stock in stockDB.stockList()]
+    stocks = list(set(pfdb.CurrentStocks() + [stock[0].upper() for stock in stockDB.stockList()]))
     for result in predictions.values:
         ticker = result[1]
         if ticker.upper() in stocks:

@@ -46,6 +46,6 @@ function load(){
   console.log("Loading page...");
   updateTable();
   updateNews();
-  setInterval(updateTable, 120 * 1000);
+  setInterval(updateTable, 60 * 1000);
   setInterval(updateNews, 600 * 1000);
 }

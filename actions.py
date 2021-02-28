@@ -125,7 +125,8 @@ def QuarterlyCheck(stock_datas=None):
 
 def tradingMode():
     stockDB = StockDB()
-    stock_ids = [stock_item[0] for stock_item in stockDB.stockList()]
+    pfdb = PortfolioDB()
+    stock_ids = list(set(pfdb.CurrentStocks() + [stock[0] for stock in stockDB.stockList()]))
     stock_data = checkStocksThreaded(stock_ids)
     QuarterlyCheck(stock_data)
     message = "Stocks Report:\n\nStock ID - Stock Price - Increase/Decrease %"
@@ -224,7 +225,7 @@ def newMessage(message):
         try:
             stock_info = checkStock(stock_id)
             pdfb = PortfolioDB()
-            pdfb.addStock(stock_id, quantity, unit_price, 9.99, date.strftime("%d/%m/%Y"), trans_type)
+            pdfb.addStock(stock_id, quantity, unit_price, 9.9, date.strftime("%d/%m/%Y"), trans_type)
             sendMessage(f"Ticker: {stock_id}\nQuantity: {quantity}\nUnit Price: ${unit_price}\nCommission Price: $9.99\nDate: {date.strftime('%d/%m/%Y')}\nType: {trans_type}\nAdded succesfully to portfolio")
         except:
             sendMessage(
@@ -300,8 +301,9 @@ def newMessage(message):
         sendMessage(message)
     elif command == 'report':
         stockDB = StockDB()
+        pfdb = PortfolioDB()
         message = "Stocks Report:\n\nStock ID - Stock Price - Increase/Decrease %"
-        stock_ids = [stock_item[0] for stock_item in stockDB.stockList()]
+        stock_ids = list(set(pfdb.CurrentStocks() + [stock_item[0] for stock_item in stockDB.stockList()]))
         stock_data = checkStocksThreaded(stock_ids)
         for stock_id, stock_info in sorted(stock_data.items()):
             line = f"\n{stock_id} : ${stock_info[0]} , {'' if stock_info[1] < 0 else '+'}{stock_info[1]}%"
@@ -316,7 +318,8 @@ def newMessage(message):
     elif command == 'news_check':
         stockDB = StockDB()
         newsDB = NewsDB()
-        stock_list = [stock[0] for stock in stockDB.stockList()]
+        pfdb = PortfolioDB()
+        stock_list = list(set(pfdb.CurrentStocks() + [stock[0] for stock in stockDB.stockList()]))
         news_dict = newsDB.getNewNews(stock_list)
         for stock_id, news in news_dict.items():
             for news_one in news:
