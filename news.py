@@ -59,7 +59,7 @@ class NewsDB():
         self.conn = sqlite3.connect('news.db', check_same_thread=False)
         self.cur = self.conn.cursor()
         with open('symbols.json') as f:
-            symbols = json.load(f)
+            symbols = json.load(f) # Updated via cronjob everyday
         self.stock_symbols = symbols # 8th December 2020
         self.lemmatizer = WordNetLemmatizer()
         self.stopwords = set(stopwords.words('english'))
@@ -101,7 +101,7 @@ class NewsDB():
         for stock in self.stock_symbols:
             if stock['symbol'].upper() == stock_id.upper():
                 return stock['name'].replace('INC', '').replace(
-                    'LTD', '').split('-')[0].title().strip()
+                    'LTD', '').replace("LIMITED", '').replace("CORPORATION", "").replace("CORP", "").split('-')[0].title().strip()
         return stock_id
 
     def removeDuplicates(self, stock_id: str, news: list) -> list:
@@ -155,15 +155,17 @@ class NewsDB():
 
     def getNews(self, stock_id):
         stock_name = self.getCompany(stock_id)
-        # print(f"{stock_id} ({stock_name})")
-        news = self.getAllNews(stock_id)
-        # print(f"Stage 1: {len(news)}")
-        news = self.removeDuplicates(stock_id, news)
-        # print(f"Stage 2: {len(news)}")
-        self.addNews(stock_id, news)
-        news = self.getImportant(stock_id, stock_name, news)
-        # print(f"Stage 3: {len(news)}")
-        # print("------------------")
+
+        if len(stock_id) > 2:
+            news = self.getAllNews(stock_id)
+            news = self.removeDuplicates(stock_id, news)
+            self.addNews(stock_id, news)
+
+        if stock_name != stock_id or len(stock_id) <= 2:
+            news2 = self.getAllNews(stock_name)
+            news2 = self.removeDuplicates(stock_id, news)
+            self.addNews(stock_id, news2)
+        # news = self.getImportant(stock_id, stock_name, news + news2) # Comment out to send all news
         return news
 
     def getNewNews(self, stock_ids: list) -> dict:
