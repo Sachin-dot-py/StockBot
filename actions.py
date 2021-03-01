@@ -413,6 +413,7 @@ def newMessage(message):
         else:
             pfdb = PortfolioDB()
             pfdb.changeTicker(items[1], items[2])
+            sendMessage(f"Ticker {items[1]} successfully changed to {items[2]} in database.")
     elif command == "add_uninvested":
         items = message.split()
         if len(items) != 2:
