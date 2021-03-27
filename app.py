@@ -30,6 +30,7 @@ os.chdir(cwd)
 @app.route('/{}'.format(mbtoken), methods=['POST'])
 def moviebot_respond():
     """ Parses telegram update """
+    os.chdir(os.path.expanduser("~"))
     update = telegram.Update.de_json(request.get_json(force=True), bot)
     try:
         text = update.message.text.encode('utf-8').decode()
@@ -46,6 +47,7 @@ def moviebot_respond():
 @app.route('/{}'.format(token), methods=['POST'])
 def respond():
     """ Parses telegram update """
+    os.chdir(cwd)
     update = telegram.Update.de_json(request.get_json(force=True), bot)
     chat_id = update.message.chat.id
     text = update.message.text.encode('utf-8').decode()
