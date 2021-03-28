@@ -16,6 +16,8 @@ import finnhub
 import requests
 import os
 import datetime
+import psutil
+from selenium import webdriver
 
 logging.getLogger('urllib3').setLevel(logging.ERROR)
 bot = telegram.Bot(token=token)
@@ -396,6 +398,36 @@ def newMessage(message):
     elif command == 'stop_dashboard':
         subprocess.call('pkill -o chromium', shell=True)
         sendMessage("Dashboard stopping...")
+    elif command == 'start_cricket':
+        sendMessage("Cricket starting...")
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_experimental_option("useAutomationExtension", False)
+        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        driver = webdriver.Chrome(options=chrome_options)
+        driver.fullscreen_window()
+        driver.get("https://smartcric.com")
+        driver.implicitly_wait(1)
+        driver.find_elements_by_class_name("mca_box2")[0].find_element_by_tag_name("a").click()
+        driver.implicitly_wait(1)
+        driver.find_elements_by_class_name("mca_box2")[5].find_element_by_tag_name("a").click()
+        driver.implicitly_wait(5)
+        driver.execute_script("""var vid = document.getElementById("videoplayer"); 
+        vid.play();
+        if (vid.requestFullscreen) {
+            vid.requestFullscreen();
+        } else if (vid.webkitRequestFullscreen) {
+            vid.webkitRequestFullscreen();
+        } else if (vid.mozRequestFullScreen) {
+            vid.mozRequestFullScreen();
+        } else if (vid.msRequestFullscreen) {
+            vid.msRequestFullscreen();
+        }""")
+    elif command == 'stop_cricket':
+        PROCNAME = "chromedriver"
+        for proc in psutil.process_iter():
+            if proc.name() == PROCNAME:
+                proc.kill()
+        sendMessage("Cricket stopping...")
     elif command == "dashboard_link":
         ips = subprocess.check_output("hostname -I", shell=True).decode("utf-8").split()
         ip = ips[1]
