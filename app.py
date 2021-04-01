@@ -19,6 +19,7 @@ try:
 except:
     logging.critical("Unable to import MovieBot")
 
+import currency # Get latest currency rate
 bot = telegram.Bot(token=token)
 mbot = telegram.Bot(token=mbtoken)
 app = Flask(__name__)
