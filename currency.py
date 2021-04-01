@@ -9,7 +9,6 @@ def getRate():
     USDSGD = round(EURSGD/EURUSD,2)
     return USDSGD
 
-if __name__ == '__main__':
-    rate = getRate()
-    with open("currency.txt", "w") as f:
-        f.write(str(rate))
+rate = getRate()
+with open("currency.txt", "w") as f:
+    f.write(str(rate))
