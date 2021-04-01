@@ -84,8 +84,8 @@ def checkStocksThreaded(stock_ids: list) -> dict:
 
 def conversionRate(source : str="USD", target : str="SGD"):
     """ Get the conversion rate from one currency to another currency """
-    resp = requests.get(f"https://api.exchangeratesapi.io/latest?symbols={target}&base={source}").json()
-    rate = resp.get('rates')[target]
+    with open("currency.txt", "r") as f:
+        rate = float(f.read())
     return rate
 
 def QuarterlyCheck(stock_datas=None):
