@@ -423,6 +423,7 @@ def newMessage(message):
             vid.msRequestFullscreen();
         }""")
     elif command == 'stop_cricket':
+        subprocess.call('pkill -o chromium', shell=True)
         PROCNAME = "chromedriver"
         for proc in psutil.process_iter():
             if proc.name() == PROCNAME:
