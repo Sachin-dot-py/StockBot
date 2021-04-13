@@ -422,6 +422,7 @@ def newMessage(message):
         } else if (vid.msRequestFullscreen) {
             vid.msRequestFullscreen();
         }""")
+        subprocess.call('echo "as" | cec-client RPI -s -d', shell=True) # Change input to raspberry pi
     elif command == 'stop_cricket':
         subprocess.call('pkill -o chromium', shell=True)
         PROCNAME = "chromedriver"
