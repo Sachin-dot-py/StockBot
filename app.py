@@ -33,6 +33,8 @@ def moviebot_respond():
     """ Parses telegram update """
     os.chdir(os.path.expanduser("~"))
     update = telegram.Update.de_json(request.get_json(force=True), bot)
+    chat_id = update.effective_chat.id
+    if str(chat_id) not in ['855910557', '1207015683']: return
     try:
         text = update.message.text.encode('utf-8').decode()
         logging.info(f"MOVIEBOT: Recieved message {text}")
