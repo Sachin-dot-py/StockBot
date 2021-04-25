@@ -398,27 +398,6 @@ def newMessage(message):
     elif command == 'stop_dashboard':
         subprocess.call('pkill -o chromium', shell=True)
         sendMessage("Dashboard stopping...")
-    elif command == 'start_cricket':
-        sendMessage("Cricket starting...")
-        chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_experimental_option("useAutomationExtension", False)
-        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        driver = webdriver.Chrome(options=chrome_options)
-        driver.get("https://smartcric.com")
-        driver.implicitly_wait(1) # TODO change to WebDriverWaits using EC's
-        driver.find_elements_by_class_name("mca_box2")[0].find_element_by_tag_name("a").click()
-        driver.implicitly_wait(1)
-        driver.find_elements_by_class_name("mca_box2")[5].find_element_by_tag_name("a").click()
-        driver.implicitly_wait(5)
-        driver.execute_script("""var vid = document.getElementById("videoplayer"); vid.play(); vid.requestFullscreen();""")
-        subprocess.call('echo "as" | cec-client RPI -s -d', shell=True) # Change input to raspberry pi
-    elif command == 'stop_cricket':
-        subprocess.call('pkill -o chromium', shell=True)
-        PROCNAME = "chromedriver"
-        for proc in psutil.process_iter():
-            if proc.name() == PROCNAME:
-                proc.kill()
-        sendMessage("Cricket stopping...")
     elif command == 'update':
         subprocess.call("cd ~/StockBot; git pull; sbrs", shell=True)
         sendMessage("Updated StockBot.")
