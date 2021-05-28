@@ -32,13 +32,15 @@ os.chdir(cwd)
 def moviebot_respond():
     """ Parses telegram update """
     os.chdir(os.path.expanduser("~"))
-    update = telegram.Update.de_json(request.get_json(force=True), bot)
+    request_json = request.get_json(force=True)
+    logging.debug(request_json)
+    update = telegram.Update.de_json(request_json, bot)
     chat_id = update.effective_chat.id
     if str(chat_id) not in ['855910557', '1207015683']:
         logging.warning(f"Unknown chat id: {chat_id}")
         return
     try:
-        text = update.message.text.encode('utf-8').decode()
+        text = update.effective_message.text.encode('utf-8').decode()
         logging.info(f"MOVIEBOT: Recieved message {text}")
     except:
         logging.info("MOVIEBOT: Recieved message")
@@ -53,16 +55,19 @@ def moviebot_respond():
 def respond():
     """ Parses telegram update """
     os.chdir(cwd)
-    update = telegram.Update.de_json(request.get_json(force=True), bot)
+    request_json = request.get_json(force=True)
+    logging.debug(request_json)
+    update = telegram.Update.de_json(request_json, bot)
     chat_id = update.effective_chat.id
     if str(chat_id) not in ['855910557', '1207015683']:
         logging.warning(f"Unknown chat id: {chat_id}")
         return
     try:
-        text = update.message.text.encode('utf-8').decode()
+        text = update.effective_message.text.encode('utf-8').decode()
+        logging.info(f"Recieved message {text}")
     except:
-        text = update.channel_post.text.encode('utf-8').decode()
-    logging.info(f"Recieved message {text}")
+        pass
+        logging.info(f"Recieved message")
     try:
         newMessage(text)
     except Exception as e:
