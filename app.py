@@ -39,7 +39,7 @@ def moviebot_respond():
         chat_id = update.effective_chat.id
         if str(chat_id) not in ['855910557', '1207015683']:
             logging.warning(f"Unknown chat id: {chat_id}")
-            return
+            return 'no'
         try:
             text = update.effective_message.text.encode('utf-8').decode()
             logging.info(f"MOVIEBOT: Recieved message {text}")
@@ -60,9 +60,9 @@ def respond():
         logging.debug(request_json)
         update = telegram.Update.de_json(request_json, bot)
         chat_id = update.effective_chat.id
-        if str(chat_id) not in ['855910557', '1207015683']:
+        if str(chat_id) not in ['855910557', '1207015683', '-1001157094088']:
             logging.warning(f"Unknown chat id: {chat_id}")
-            return
+            return 'no'
         try:
             text = update.effective_message.text.encode('utf-8').decode()
             logging.info(f"Recieved message {text}")
