@@ -36,11 +36,12 @@ def moviebot_respond():
     chat_id = update.effective_chat.id
     if str(chat_id) not in ['855910557', '1207015683']:
         logging.warning(f"Unknown chat id: {chat_id}")
+        return
     try:
         text = update.message.text.encode('utf-8').decode()
         logging.info(f"MOVIEBOT: Recieved message {text}")
     except:
-        pass
+        logging.info("MOVIEBOT: Recieved message")
     try:
         apy.dispatcher.process_update(update)
     except Exception as e:
@@ -53,11 +54,15 @@ def respond():
     """ Parses telegram update """
     os.chdir(cwd)
     update = telegram.Update.de_json(request.get_json(force=True), bot)
-    chat_id = update.message.chat.id
-    text = update.message.text.encode('utf-8').decode()
-    logging.info(f"Recieved message {text}")
+    chat_id = update.effective_chat.id
     if str(chat_id) not in ['855910557', '1207015683']:
         logging.warning(f"Unknown chat id: {chat_id}")
+        return
+    try:
+        text = update.message.text.encode('utf-8').decode()
+    except:
+        text = update.channel_post.text.encode('utf-8').decode()
+    logging.info(f"Recieved message {text}")
     try:
         newMessage(text)
     except Exception as e:
