@@ -56,7 +56,8 @@ def respond():
     chat_id = update.message.chat.id
     text = update.message.text.encode('utf-8').decode()
     logging.info(f"Recieved message {text}")
-    if str(chat_id) not in ['855910557', '1207015683']: return
+    if str(chat_id) not in ['855910557', '1207015683']:
+        logging.warning(f"Unknown chat id: {chat_id}")
     try:
         newMessage(text)
     except Exception as e:
