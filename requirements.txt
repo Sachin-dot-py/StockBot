@@ -19,7 +19,7 @@ python_telegram_bot == 12.7
 
 # StockBotv2/app.py: 9
 # StockBotv2/news.py: 3
-requests == 2.23.0
+requests == 2.31.0
 
 # StockBotv2/predictions.py: 1
 selenium == 3.141.0
